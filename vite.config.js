@@ -9,6 +9,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons.svg'],
+      workbox: {
+        maximumFileSizeToCacheInBytes: 3000000, // 3MB
+      },
       manifest: {
         name: 'Escala Pratique',
         short_name: 'Escala',
@@ -30,6 +33,17 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'styled-components', 'firebase/app', 'firebase/firestore'],
+          icons: ['react-icons/fa', 'react-icons/fa6'],
+          pdf: ['@react-pdf/renderer']
+        }
+      }
+    }
+  },
   server: {
     open: true,
   },
