@@ -4,6 +4,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    global: 'window',
+  },
   plugins: [
     react(),
     VitePWA({
@@ -13,18 +16,25 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 3000000, // 3MB
       },
       manifest: {
-        name: 'Escala Pratique',
-        short_name: 'Escala',
-        description: 'Gerenciador de Escalas Pratique Fitness',
+        name: 'Escala Pratique | Gerenciador Fitness',
+        short_name: 'Escala Pratique',
+        description: 'Gerenciador de escalas e sorteios para colaboradores da Pratique Fitness.',
         theme_color: '#e50914',
-        background_color: '#f8f9fa',
+        background_color: '#ffffff',
         display: 'standalone',
+        orientation: 'portrait',
         icons: [
           {
             src: 'favicon.svg',
-            sizes: 'any',
+            sizes: '192x192',
             type: 'image/svg+xml',
             purpose: 'any maskable'
+          },
+          {
+            src: 'favicon.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any'
           }
         ]
       },

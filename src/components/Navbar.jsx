@@ -35,7 +35,7 @@ const LogoSection = styled.div`
     min-width: 140px;
 
     img {
-      height: 32px;
+      height: 54px;
       object-fit: contain;
       @media (max-width: 900px) {
         height: 45px;
@@ -154,16 +154,14 @@ export const Navbar = ({ activeTab, setActiveTab, unitName }) => {
         <LogoSection>
           <div className="logo-box">
             <img src="https://pratiquefitness.com.br/wp-content/uploads/2025/10/pratique-logo-academia.webp" alt="Pratique" />
-            <span>{unitName}</span>
           </div>
-          <h1>Gerador de Escalas</h1>
         </LogoSection>
 
         <DesktopMenu>
           {tabs.map(tab => (
-            <TabButton 
+            <TabButton
               key={tab.id}
-              $active={activeTab === tab.id} 
+              $active={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id)}
             >
               {tab.icon} <span>{tab.label}</span>
@@ -174,9 +172,9 @@ export const Navbar = ({ activeTab, setActiveTab, unitName }) => {
 
       <MobileTabBar>
         {tabs.map(tab => (
-          <MobileTab 
+          <MobileTab
             key={tab.id}
-            $active={activeTab === tab.id} 
+            $active={activeTab === tab.id}
             onClick={() => setActiveTab(tab.id)}
           >
             {tab.icon}

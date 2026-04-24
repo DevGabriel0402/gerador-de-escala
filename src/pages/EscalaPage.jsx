@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { 
   FaCalendarPlus, FaEdit, FaSave, FaPlus, FaEye, FaTrash, 
-  FaPalette, FaPlusCircle
+  FaPalette, FaPlusCircle, FaEraser
 } from 'react-icons/fa';
-import { FaArrowRightArrowLeft } from 'react-icons/fa6';
+import { FaArrowRightArrowLeft, FaShuffle } from 'react-icons/fa6';
 import { Card, Button, IconButton } from '../styles/components';
 import { saveScheduleRow, clearSchedule } from '../services/firestore';
 import { EmployeeSelectionModal } from '../components/EmployeeSelectionModal';
@@ -152,6 +152,100 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
     if (row) await handleUpdate(id, 'highlight', !row.highlight);
   };
 
+  const handleRandomGeneration = async () => {
+    if (employees.length === 0) {
+      toast.error('Nenhum colaborador cadastrado');
+      return;
+    }
+
+    if (!confirm('Deseja preencher a escala aleatoriamente? Isso substituirá os dados atuais.')) return;
+
+    const loadingToast = toast.loading('Sorteando colaboradores...');
+    
+    try {
+      // Criar pool de nomes disponíveis
+      let pool = [...employees.map(e => e.name)];
+      const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+      
+      const getNext = (excluded = []) => {
+        // Filtrar pool para remover quem já está no dia atual
+        let available = pool.filter(p => !excluded.includes(p));
+        
+        if (available.length === 0) {
+          // Se não houver ninguém disponível que não esteja no dia,
+          // resetamos o pool mas ainda respeitamos o excluded se possível
+          pool = [...employees.map(e => e.name)];
+          shuffle(pool);
+          available = pool.filter(p => !excluded.includes(p));
+          
+          // Caso extremo: se mesmo resetando não houver ninguém (ex: 1 funcionário para 2 vagas)
+          if (available.length === 0) available = pool;
+        }
+        
+        const selected = available.pop();
+        // Remover o selecionado do pool original
+        pool = pool.filter(p => p !== selected);
+        return selected;
+      };
+
+      shuffle(pool);
+
+      for (let i = 0; i < schedule.length; i++) {
+        const row = schedule[i];
+        const isSaturday = row.day.toUpperCase() === 'SÁBADO';
+        const dayUsed = [];
+        
+        // Sábado Low (2 vagas) ou Domingo Low (1 vaga)
+        const low1 = getNext(dayUsed);
+        dayUsed.push(low1);
+        
+        let lowValue = low1;
+        if (isSaturday) {
+          const low2 = getNext(dayUsed);
+          dayUsed.push(low2);
+          lowValue = `${low1}\n${low2}`;
+        }
+
+        // Prime (1 vaga)
+        const primeValue = getNext(dayUsed);
+        dayUsed.push(primeValue);
+
+        await saveScheduleRow({
+          ...row,
+          low: lowValue,
+          prime: primeValue,
+          trocaLow: '',
+          trocaPrime: ''
+        }, i);
+      }
+
+      toast.success('Escala gerada com sucesso!', { id: loadingToast });
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao gerar escala', { id: loadingToast });
+    }
+  };
+
+  const handleClearAllNames = async () => {
+    if (!confirm('Deseja limpar todos os nomes desta escala? As datas e dias serão mantidos.')) return;
+    
+    const loadingToast = toast.loading('Limpando nomes...');
+    try {
+      for (let i = 0; i < schedule.length; i++) {
+        await saveScheduleRow({
+          ...schedule[i],
+          low: '',
+          prime: '',
+          trocaLow: '',
+          trocaPrime: ''
+        }, i);
+      }
+      toast.success('Nomes removidos!', { id: loadingToast });
+    } catch (error) {
+      toast.error('Erro ao limpar escala', { id: loadingToast });
+    }
+  };
+
   const openModal = (rowId, field, dayName, fieldName) => {
     setModal({ isOpen: true, rowId, field, dayName, fieldName, swapStep: 1, firstEmployee: null });
   };
@@ -196,6 +290,12 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
               <FaPlus /> Add Linha
             </Button>
           )}
+          <Button $variant="dark" onClick={handleRandomGeneration}>
+            <FaShuffle /> Sorteio Aleatório
+          </Button>
+          <Button $variant="danger" style={{ color: '#000' }} onClick={handleClearAllNames}>
+            <FaEraser /> Limpar Nomes
+          </Button>
           <Button $variant="blue" onClick={() => setIsPreviewModalOpen(true)}>
             <FaEye /> Pré-visualizar & Exportar
           </Button>

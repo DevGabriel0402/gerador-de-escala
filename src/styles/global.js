@@ -40,26 +40,60 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   @media print {
-    /* Esconder tudo por padrão */
-    body * {
-      visibility: hidden;
+    @page {
+      size: A4;
+      margin: 5mm;
     }
-    /* Mostrar apenas a área de captura ou a tabela de escala */
-    #capture-area, #capture-area * {
-      visibility: visible;
+    body {
+      background: #fff !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    #root > *:not(.modal-overlay) {
+      display: none !important;
+    }
+    .no-print, button, nav {
+      display: none !important;
+    }
+    .modal-overlay {
+      position: static !important;
+      background: none !important;
+      padding: 0 !important;
+      display: block !important;
+    }
+    .modal-content {
+      position: static !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+      display: block !important;
     }
     #capture-area {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      border: none;
+      max-height: none !important;
+      overflow: visible !important;
+      background: none !important;
+      border: none !important;
+      padding: 0 !important;
     }
-    /* Esconder modais e overlays */
-    .no-print, [role="dialog"], .modal-overlay {
-      display: none !important;
+    #print-area {
+      display: block !important;
+      visibility: visible !important;
+      width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      max-height: none !important;
+      overflow: visible !important;
+    }
+    #print-area * {
+      visibility: visible !important;
+    }
+    /* Garantir que o texto seja preto */
+    #print-area table, #print-area td, #print-area th {
+      border: 1px solid #000 !important;
+      color: #000 !important;
     }
   }
 
