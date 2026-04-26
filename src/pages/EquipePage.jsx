@@ -149,7 +149,25 @@ export const EquipePage = ({ employees }) => {
   return (
     <Container>
       <div>
-        <h2 style={{ marginBottom: '1.5rem', fontWeight: 900 }}>Gerenciar Equipe</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h2 style={{ margin: 0, fontWeight: 900 }}>Gerenciar Equipe</h2>
+          <Button $variant="outline" style={{ fontSize: '0.7rem', padding: '5px 10px' }} onClick={async () => {
+            if (confirm('Deseja migrar TODOS os funcionários para a categoria LOW?')) {
+              const loadingToast = toast.loading('Migrando...');
+              try {
+                for (const emp of employees) {
+                  await saveEmployee({ ...emp, role: 'low' });
+                }
+                toast.success('Todos os funcionários foram movidos para LOW!', { id: loadingToast });
+              } catch (err) {
+                toast.error('Erro na migração', { id: loadingToast });
+              }
+            }
+          }}>
+            Migrar todos para LOW
+          </Button>
+        </div>
+
         <FormRow>
           <Input 
             placeholder="NOME COMPLETO" 
