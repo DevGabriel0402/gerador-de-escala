@@ -71,7 +71,7 @@ export const Button = styled.button`
 
 export const IconButton = styled.button`
   background: transparent;
-  color: ${props => props.color || props.theme.colors.gray.dark};
+  color: ${props => props.$color || props.theme.colors.gray.dark};
   padding: 0.4rem;
   border-radius: ${props => props.theme.radius.small};
   display: flex;
@@ -81,6 +81,7 @@ export const IconButton = styled.button`
 
   &:hover {
     background: ${props => props.theme.colors.gray.light};
-    color: ${props => props.hoverColor || props.theme.colors.primary};
+    color: ${props => props.$hoverColor || props.theme.colors.primary};
   }
 `;
+

@@ -446,7 +446,8 @@ export const EscalaPage = ({
                   <td className="no-print">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
                       <IconButton onClick={() => handleToggleHighlight(row.id)} title="Destaque"><FaPalette /></IconButton>
-                      <IconButton onClick={() => handleDeleteRow(row.id)} hoverColor="#e50914" title="Remover"><FaTrash /></IconButton>
+                      <IconButton onClick={() => handleDeleteRow(row.id)} $hoverColor="#e50914" title="Remover"><FaTrash /></IconButton>
+
                     </div>
                   </td>
                 )}

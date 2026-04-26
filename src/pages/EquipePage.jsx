@@ -189,7 +189,7 @@ export const EquipePage = ({ employees }) => {
             filtered.map(emp => (
               <EmployeeCard key={emp.id}>
                 <span>{emp.name}</span>
-                <IconButton onClick={() => handleDelete(emp.id)} hoverColor="#e50914">
+                <IconButton onClick={() => handleDelete(emp.id)} $hoverColor="#e50914">
                   <FaTrash />
                 </IconButton>
               </EmployeeCard>

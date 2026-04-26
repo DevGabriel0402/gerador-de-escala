@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { Toaster } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast';
 import { FaCalendarPlus, FaXmark, FaEye, FaFilePdf, FaImage, FaShareNodes, FaPrint } from 'react-icons/fa6';
 import { Loader2 } from 'lucide-react'; // Mantendo Loader2 pois é elegante
 import html2canvas from 'html2canvas';
@@ -26,7 +26,8 @@ import {
 
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { EscalaPDF } from './utils/EscalaPDF';
-import logoPratique from './assets/Menor-PRATIQUE.png';
+import logoApp from './assets/logo.png';
+
 
 const Main = styled.main`
   max-width: 1200px;
@@ -75,7 +76,7 @@ export default function App() {
 
   const [warningMessage, setWarningMessage] = useState('Chegar com 20 minutos de antecedência para preparar o ambiente da academia.');
   const [monthName, setMonthName] = useState('');
-  const [globalModal, setGlobalModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {}, type: 'info', isAlert: false });
+  const [globalModal, setGlobalModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => { }, type: 'info', isAlert: false });
 
 
   useEffect(() => {
@@ -244,10 +245,11 @@ export default function App() {
                   marginBottom: '10px'
                 }}>
                   <img
-                    src={logoPratique}
+                    src="logo.png"
                     alt="Logo"
-                    style={{ height: '100px' }}
+                    style={{ height: '140px' }}
                   />
+
                   <span style={{ color: '#e50914', fontWeight: 900, fontSize: '1rem', letterSpacing: '2px', textTransform: 'uppercase' }}>{unitName}</span>
                 </div>
                 <h2 style={{ fontSize: '1.8rem', fontWeight: 900, textTransform: 'uppercase', color: theme.colors.primary, marginBottom: '5px', textAlign: 'center' }}>
@@ -358,16 +360,15 @@ export default function App() {
       }}>
         {/* Top Decorative Bar */}
         <div style={{ width: '100%', height: '80px', background: '#e50914', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ color: 'white', fontWeight: 900, fontSize: '24px', letterSpacing: '8px', textTransform: 'uppercase' }}>Escala Pratique</span>
+          <span style={{ color: 'white', fontWeight: 900, fontSize: '24px', letterSpacing: '8px', textTransform: 'uppercase' }}>Escala Pratique {unitName}</span>
         </div>
 
         <div style={{ marginTop: '60px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <img src={logoPratique} alt="Logo" style={{ height: '140px', marginBottom: '20px' }} />
-          <h2 style={{ color: '#e50914', fontWeight: 900, fontSize: '2.5rem', letterSpacing: '4px', textTransform: 'uppercase', margin: 0 }}>{unitName}</h2>
-          
+          <img src={logoApp} alt="Logo" style={{ height: '120px', marginBottom: '20px' }} />
+
           <div style={{ margin: '40px 0' }}>
             <h1 style={{
-              fontSize: '56px',
+              fontSize: '44px',
               fontWeight: '900',
               textTransform: 'uppercase',
               color: '#000',
@@ -376,16 +377,13 @@ export default function App() {
               textAlign: 'center',
               maxWidth: '900px'
             }}>
-              ESCALA DE FINAL DE SEMANA
+              ESCALA DE FINAL DE SEMANA MÊS DE {monthName || '...'}
             </h1>
-            <h3 style={{ fontSize: '32px', fontWeight: '900', color: '#666', marginTop: '10px', textTransform: 'uppercase' }}>
-              MÊS DE {monthName || '...'}
-            </h3>
             <div style={{ width: '200px', height: '10px', background: '#e50914', margin: '20px auto 0', borderRadius: '10px' }}></div>
           </div>
         </div>
 
-        <div style={{ width: '980px', marginTop: '40px', background: 'white', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', border: '4px solid #000' }}>
+        <div style={{ width: '980px', marginTop: '20px', background: 'white', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', border: '4px solid #000' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr>
@@ -410,10 +408,10 @@ export default function App() {
                     <span style={{ fontSize: '28px' }}>{row.date}</span><br />
                     <span style={{ fontSize: '20px', color: '#666' }}>{row.day}</span>
                   </td>
-                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#1a1a1a' }}>{row.low}</td>
-                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#1a1a1a' }}>{row.prime}</td>
-                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#666' }}>{row.trocaLow}</td>
-                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#666' }}>{row.trocaPrime}</td>
+                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '500', textAlign: 'center', color: '#1a1a1a' }}>{row.low}</td>
+                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '500', textAlign: 'center', color: '#1a1a1a' }}>{row.prime}</td>
+                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '500', textAlign: 'center', color: '#666' }}>{row.trocaLow}</td>
+                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '500', textAlign: 'center', color: '#666' }}>{row.trocaPrime}</td>
                 </tr>
               ))}
             </tbody>
@@ -441,9 +439,9 @@ export default function App() {
 
 
       {globalModal.isOpen && (
-        <CustomModal 
-          {...globalModal} 
-          onCancel={() => setGlobalModal({ ...globalModal, isOpen: false })} 
+        <CustomModal
+          {...globalModal}
+          onCancel={() => setGlobalModal({ ...globalModal, isOpen: false })}
         />
       )}
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
-import LogoPratique from '../assets/Menor-PRATIQUE.png';
+import LogoApp from '../assets/logo.png';
+
 
 
 
@@ -30,7 +31,8 @@ const styles = StyleSheet.create({
   tableCol: { width: '20%', borderRightWidth: 1, borderColor: '#000', padding: 5, justifyContent: 'center', alignItems: 'center' },
   lastCol: { borderRightWidth: 0 },
 
-  headerText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center', color: '#ffffff !important' },
+  headerText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center', color: '#ffffff' },
+
 
   cellText: { fontSize: 8, fontWeight: 'normal', textAlign: 'center' },
   dayText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase' },
@@ -48,7 +50,8 @@ export const EscalaPDF = ({ schedule, unitName, warningMessage, monthName }) => 
 
       <View style={styles.header}>
         <View style={styles.logoContainer}>
-          <Image src={LogoPratique} style={styles.logo} />
+          <Image src={LogoApp} style={styles.logo} />
+
           <Text style={styles.unit}>{unitName}</Text>
         </View>
         <Text style={styles.title}>Escala de Final de Semana {monthName && `- ${monthName}`}</Text>
