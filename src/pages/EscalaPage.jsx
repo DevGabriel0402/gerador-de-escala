@@ -9,6 +9,8 @@ import { Card, Button, IconButton } from '../styles/components';
 import { saveScheduleRow, clearSchedule } from '../services/firestore';
 import { EmployeeSelectionModal } from '../components/EmployeeSelectionModal';
 import toast from 'react-hot-toast';
+import { FaCircleInfo } from 'react-icons/fa6';
+
 
 const Container = styled.div`
   display: flex;
@@ -122,7 +124,16 @@ const AddBtn = styled.button`
   &:hover { background: ${props => props.type === 'swap' ? '#d6e9ff' : '#ffe4e4'}; }
 `;
 
-export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPreviewModalOpen }) => {
+export const EscalaPage = ({ 
+  schedule, 
+  employees, 
+  setIsMonthModalOpen, 
+  setIsPreviewModalOpen,
+  warningMessage,
+  monthName,
+  setGlobalModal
+}) => {
+
   const [isEditing, setIsEditing] = useState(false);
   const [modal, setModal] = useState({ isOpen: false, rowId: null, field: null, dayName: '', fieldName: '', swapStep: 1, firstEmployee: null, targetRole: null, slotIndex: 0 });
 
@@ -138,12 +149,20 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
   };
 
   const handleDeleteRow = async (id) => {
-    if (confirm('Remover esta linha?')) {
-      const row = schedule.find(r => r.id === id);
-      if (row) await clearSchedule([row]);
-      toast.success('Removido');
-    }
+    setGlobalModal({
+      isOpen: true,
+      title: 'Remover Linha',
+      message: 'Deseja remover esta linha da escala?',
+      type: 'danger',
+      onConfirm: async () => {
+        const row = schedule.find(r => r.id === id);
+        if (row) await clearSchedule([row]);
+        toast.success('Removido');
+        setGlobalModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
+
 
   const handleToggleHighlight = async (id) => {
     const row = schedule.find(r => r.id === id);
@@ -156,95 +175,106 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
       return;
     }
 
-    if (!confirm('Deseja preencher a escala aleatoriamente? Isso substituirá os dados atuais.')) return;
-
-    const loadingToast = toast.loading('Sorteando colaboradores...');
-    
-    try {
-      // Criar pools separados
-      let poolLow = [...employees.filter(e => e.role === 'low').map(e => e.name)];
-      let poolPrime = [...employees.filter(e => e.role === 'prime').map(e => e.name)];
-      
-      const shuffle = (array) => array.sort(() => Math.random() - 0.5);
-      shuffle(poolLow);
-      shuffle(poolPrime);
-
-      const getNext = (type, excluded = []) => {
-        let pool = type === 'low' ? poolLow : poolPrime;
-        let available = pool.filter(p => !excluded.includes(p));
+    setGlobalModal({
+      isOpen: true,
+      title: 'Sorteio Aleatório',
+      message: 'Deseja preencher a escala aleatoriamente? Isso substituirá os nomes atuais.',
+      type: 'info',
+      onConfirm: async () => {
+        setGlobalModal(prev => ({ ...prev, isOpen: false }));
+        const loadingToast = toast.loading('Sorteando colaboradores...');
         
-        if (available.length === 0) {
-          // Resetar pool se necessário
-          const original = employees.filter(e => e.role === type).map(e => e.name);
-          if (type === 'low') poolLow = shuffle([...original]);
-          else poolPrime = shuffle([...original]);
-          pool = type === 'low' ? poolLow : poolPrime;
-          available = pool.filter(p => !excluded.includes(p));
-          if (available.length === 0) available = pool;
+        try {
+          // Criar pools separados
+          let poolLow = [...employees.filter(e => e.role === 'low').map(e => e.name)];
+          let poolPrime = [...employees.filter(e => e.role === 'prime').map(e => e.name)];
+          
+          const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+          shuffle(poolLow);
+          shuffle(poolPrime);
+
+          const getNext = (type, excluded = []) => {
+            let pool = type === 'low' ? poolLow : poolPrime;
+            let available = pool.filter(p => !excluded.includes(p));
+            
+            if (available.length === 0) {
+              const original = employees.filter(e => e.role === type).map(e => e.name);
+              if (type === 'low') poolLow = shuffle([...original]);
+              else poolPrime = shuffle([...original]);
+              pool = type === 'low' ? poolLow : poolPrime;
+              available = pool.filter(p => !excluded.includes(p));
+              if (available.length === 0) available = pool;
+            }
+            
+            const selected = available.pop();
+            if (type === 'low') poolLow = poolLow.filter(p => p !== selected);
+            else poolPrime = poolPrime.filter(p => p !== selected);
+            return selected;
+          };
+
+          for (let i = 0; i < schedule.length; i++) {
+            const row = schedule[i];
+            const isSaturday = row.day.toUpperCase() === 'SÁBADO';
+            const dayUsed = [];
+            
+            const low1 = getNext('low', dayUsed);
+            dayUsed.push(low1);
+            
+            let lowValue = low1;
+            if (isSaturday) {
+              const low2 = getNext('low', dayUsed);
+              dayUsed.push(low2);
+              lowValue = `${low1}\n${low2}`;
+            }
+
+            const primeValue = getNext('prime', dayUsed);
+            dayUsed.push(primeValue);
+
+            await saveScheduleRow({
+              ...row,
+              low: lowValue,
+              prime: primeValue,
+              trocaLow: '',
+              trocaPrime: ''
+            }, i);
+          }
+
+          toast.success('Escala gerada!', { id: loadingToast });
+        } catch (error) {
+          toast.error('Erro ao gerar', { id: loadingToast });
         }
-        
-        const selected = available.pop();
-        if (type === 'low') poolLow = poolLow.filter(p => p !== selected);
-        else poolPrime = poolPrime.filter(p => p !== selected);
-        return selected;
-      };
-
-      for (let i = 0; i < schedule.length; i++) {
-        const row = schedule[i];
-        const isSaturday = row.day.toUpperCase() === 'SÁBADO';
-        const dayUsed = [];
-        
-        // Sábado Low (2 vagas) ou Domingo Low (1 vaga)
-        const low1 = getNext('low', dayUsed);
-        dayUsed.push(low1);
-        
-        let lowValue = low1;
-        if (isSaturday) {
-          const low2 = getNext('low', dayUsed);
-          dayUsed.push(low2);
-          lowValue = `${low1}\n${low2}`;
-        }
-
-        // Prime (1 vaga)
-        const primeValue = getNext('prime', dayUsed);
-        dayUsed.push(primeValue);
-
-
-        await saveScheduleRow({
-          ...row,
-          low: lowValue,
-          prime: primeValue,
-          trocaLow: '',
-          trocaPrime: ''
-        }, i);
       }
-
-      toast.success('Escala gerada com sucesso!', { id: loadingToast });
-    } catch (error) {
-      console.error(error);
-      toast.error('Erro ao gerar escala', { id: loadingToast });
-    }
+    });
   };
+
 
   const handleClearAllNames = async () => {
-    if (!confirm('Deseja limpar todos os nomes desta escala? As datas e dias serão mantidos.')) return;
-    
-    const loadingToast = toast.loading('Limpando nomes...');
-    try {
-      for (let i = 0; i < schedule.length; i++) {
-        await saveScheduleRow({
-          ...schedule[i],
-          low: '',
-          prime: '',
-          trocaLow: '',
-          trocaPrime: ''
-        }, i);
+    setGlobalModal({
+      isOpen: true,
+      title: 'Limpar Nomes',
+      message: 'Deseja limpar todos os nomes desta escala? As datas e dias serão mantidos.',
+      type: 'danger',
+      onConfirm: async () => {
+        setGlobalModal(prev => ({ ...prev, isOpen: false }));
+        const loadingToast = toast.loading('Limpando nomes...');
+        try {
+          for (let i = 0; i < schedule.length; i++) {
+            await saveScheduleRow({
+              ...schedule[i],
+              low: '',
+              prime: '',
+              trocaLow: '',
+              trocaPrime: ''
+            }, i);
+          }
+          toast.success('Nomes removidos!', { id: loadingToast });
+        } catch (error) {
+          toast.error('Erro ao limpar escala', { id: loadingToast });
+        }
       }
-      toast.success('Nomes removidos!', { id: loadingToast });
-    } catch (error) {
-      toast.error('Erro ao limpar escala', { id: loadingToast });
-    }
+    });
   };
+
 
   const openModal = (rowId, field, dayName, fieldName, slotIndex = 0) => {
     const targetRole = field.toLowerCase().includes('prime') ? 'prime' : 'low';
@@ -286,9 +316,10 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
     <Container>
       <Actions className="no-print">
         <div className="left">
-          <h2 style={{ fontWeight: 900 }}>Escala de Final de Semana</h2>
+          <h2 style={{ fontWeight: 900 }}>Escala de Final de Semana {monthName && `- ${monthName}`}</h2>
           <p style={{ color: '#999', fontSize: '0.9rem' }}>Gerencie o plantão da sua unidade.</p>
         </div>
+
         <div className="right">
           <Button $variant="purple" onClick={() => setIsMonthModalOpen(true)}>
             <FaCalendarPlus /> Nova Escala Mensal
@@ -399,6 +430,21 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
           </tbody>
         </Table>
       </TableContainer>
+
+      {warningMessage && (
+        <Card style={{ 
+          border: '2px solid #000', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '1rem',
+          background: '#fff1f1'
+        }}>
+          <FaCircleInfo style={{ fontSize: '1.5rem', color: '#e50914' }} />
+          <p style={{ margin: 0, fontWeight: 900, fontSize: '0.9rem', color: '#000', textTransform: 'uppercase' }}>
+            {warningMessage}
+          </p>
+        </Card>
+      )}
 
       <EmployeeSelectionModal 
         modal={modal} 

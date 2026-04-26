@@ -11,6 +11,9 @@ import { EscalaPage } from './pages/EscalaPage';
 import { EquipePage } from './pages/EquipePage';
 import { SorteioPage } from './pages/SorteioPage';
 import { Card, Button, IconButton } from './styles/components';
+import { CustomModal } from './components/CustomModal';
+import { FaCircleInfo } from 'react-icons/fa6';
+
 
 import {
   subscribeEmployees,
@@ -70,14 +73,22 @@ export default function App() {
   const [selectedMonth, setSelectedMonth] = useState('');
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
+  const [warningMessage, setWarningMessage] = useState('Chegar com 20 minutos de antecedência para preparar o ambiente da academia.');
+  const [monthName, setMonthName] = useState('');
+  const [globalModal, setGlobalModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {}, type: 'info', isAlert: false });
+
+
   useEffect(() => {
     const unsubEmployees = subscribeEmployees(setEmployees);
     const unsubSchedule = subscribeSchedule(setSchedule);
     const unsubSettings = subscribeSettings((data) => {
       setUnitName(data.unitName || 'MANGABEIRAS');
       setDraftedEmployees(data.draftedEmployees || []);
+      setWarningMessage(data.warningMessage || 'Chegar com 20 minutos de antecedência para preparar o ambiente da academia.');
+      setMonthName(data.monthName || '');
       setIsLoading(false);
     });
+
 
     return () => {
       unsubEmployees();
@@ -112,26 +123,46 @@ export default function App() {
             employees={employees}
             setIsMonthModalOpen={setIsMonthModalOpen}
             setIsPreviewModalOpen={setIsPreviewModalOpen}
+            warningMessage={warningMessage}
+            monthName={monthName}
+            setGlobalModal={setGlobalModal}
           />
+
         )}
         {activeTab === 'equipe' && <EquipePage employees={employees} />}
         {activeTab === 'sorteio' && <SorteioPage employees={employees} draftedEmployees={draftedEmployees} />}
         {activeTab === 'ajustes' && (
           <Card style={{ maxWidth: '600px' }}>
             <h2 style={{ fontWeight: 900, marginBottom: '2rem' }}>Configurações</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.8rem', fontWeight: 900, color: '#666' }}>Nome da Unidade</label>
-              <input
-                style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', textTransform: 'uppercase', fontWeight: 'bold' }}
-                value={unitName}
-                onChange={async e => {
-                  setUnitName(e.target.value.toUpperCase());
-                  await updateSettings({ unitName: e.target.value.toUpperCase() });
-                }}
-              />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 900, color: '#666' }}>Nome da Unidade</label>
+                <input
+                  style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', textTransform: 'uppercase', fontWeight: 'bold' }}
+                  value={unitName}
+                  onChange={e => setUnitName(e.target.value.toUpperCase())}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 900, color: '#666' }}>Mensagem de Aviso (Rodapé)</label>
+                <textarea
+                  style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', fontWeight: 'bold', minHeight: '100px', resize: 'vertical' }}
+                  value={warningMessage}
+                  onChange={e => setWarningMessage(e.target.value)}
+                />
+              </div>
+
+              <Button $variant="success" onClick={async () => {
+                await updateSettings({ unitName, warningMessage });
+                toast.success('Configurações salvas!');
+              }}>
+                Salvar Alterações
+              </Button>
             </div>
           </Card>
         )}
+
       </Main>
 
       {/* MODAL MÊS */}
@@ -146,8 +177,9 @@ export default function App() {
               <Button $variant="primary" style={{ flex: 1 }} disabled={!selectedMonth} onClick={async () => {
                 // Lógica de gerar mês (integrada aqui para simplificar)
                 setIsLoading(true);
-                await clearSchedule(schedule);
                 const [year, month] = selectedMonth.split('-');
+                const monthNameValue = new Date(year, month - 1, 1).toLocaleString('pt-BR', { month: 'long' });
+                await updateSettings({ monthName: monthNameValue });
                 const daysInMonth = new Date(year, month, 0).getDate();
                 let rowId = Date.now();
                 for (let day = 1; day <= daysInMonth; day++) {
@@ -164,6 +196,7 @@ export default function App() {
                 setIsMonthModalOpen(false);
                 setIsLoading(false);
               }}>Gerar Agora</Button>
+
             </div>
           </ModalContent>
         </ModalOverlay>
@@ -219,9 +252,10 @@ export default function App() {
                 <h2 style={{ fontSize: '1.8rem', fontWeight: 900, textTransform: 'uppercase', color: theme.colors.primary, marginBottom: '5px', textAlign: 'center' }}>
                   {unitName}
                 </h2>
-                <h4 style={{ fontSize: '1.2rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '30px' }}>
-                  Escala de Final de Semana
+                <h4 style={{ fontSize: '1.1rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '30px', textAlign: 'center' }}>
+                  Escala de Final de Semana do Mês de {monthName || '...'}
                 </h4>
+
 
                 <table style={{
                   width: '100%',
@@ -255,8 +289,18 @@ export default function App() {
                     ))}
                   </tbody>
                 </table>
+
+                {warningMessage && (
+                  <div style={{ marginTop: '30px', padding: '15px', border: '2px solid #000', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '15px', width: '100%' }}>
+                    <FaCircleInfo style={{ fontSize: '1.5rem', color: '#e50914' }} />
+                    <span style={{ fontSize: '0.9rem', fontWeight: 900, textTransform: 'uppercase', color: '#000' }}>
+                      {warningMessage}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
+
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
               <Button
@@ -336,10 +380,13 @@ export default function App() {
             textTransform: 'uppercase',
             color: '#000',
             lineHeight: '1.1',
-            margin: 0
+            margin: 0,
+            textAlign: 'center',
+            maxWidth: '900px'
           }}>
-            ESCALA DE FINAL DE SEMANA
+            ESCALA DE FINAL DE SEMANA DO MÊS DE {monthName || '...'}
           </h1>
+
           <div style={{ width: '180px', height: '12px', background: '#e50914', margin: '15px auto 0' }}></div>
         </div>
 
@@ -379,12 +426,28 @@ export default function App() {
           </table>
         </div>
 
-        <div style={{ marginTop: 'auto', marginBottom: '100px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ marginTop: 'auto', marginBottom: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+          {warningMessage && (
+            <div style={{ width: '960px', padding: '30px', border: '5px solid #000', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '30px' }}>
+              <FaCircleInfo style={{ fontSize: '3rem', color: '#e50914' }} />
+              <span style={{ fontSize: '24px', fontWeight: 900, textTransform: 'uppercase', color: '#000' }}>
+                {warningMessage}
+              </span>
+            </div>
+          )}
           <span style={{ fontSize: '32px', fontWeight: '900', color: '#666', textTransform: 'uppercase' }}>
             BOM TRABALHO EQUIPE! 💪
           </span>
         </div>
       </div>
+
+      {globalModal.isOpen && (
+        <CustomModal 
+          {...globalModal} 
+          onCancel={() => setGlobalModal({ ...globalModal, isOpen: false })} 
+        />
+      )}
+
     </ThemeProvider>
   );
 }

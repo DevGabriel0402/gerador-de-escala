@@ -22,20 +22,26 @@ const styles = StyleSheet.create({
 
   table: { display: 'table', width: '100%', borderStyle: 'solid', borderWidth: 2, borderColor: '#000' },
   tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000' },
-  tableRowHighlight: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000', backgroundColor: '#c0c0c0' },
-  tableHeader: { borderBottomWidth: 2, borderColor: '#000' },
+  tableRowHighlight: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#000', backgroundColor: '#fff1f1' },
+  tableHeader: { borderBottomWidth: 2, borderColor: '#000', backgroundColor: '#e50914' },
+
 
   tableColHeader: { width: '20%', borderRightWidth: 2, borderColor: '#000', padding: 5, justifyContent: 'center', alignItems: 'center' },
   tableCol: { width: '20%', borderRightWidth: 1, borderColor: '#000', padding: 5, justifyContent: 'center', alignItems: 'center' },
   lastCol: { borderRightWidth: 0 },
 
-  headerText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center' },
+  headerText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center', color: 'white' },
+
   cellText: { fontSize: 8, fontWeight: 'normal', textAlign: 'center' },
   dayText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase' },
-  dateText: { fontSize: 8, fontWeight: 'bold' }
+  dateText: { fontSize: 8, fontWeight: 'bold' },
+  warningContainer: { marginTop: 20, padding: 10, border: 1, borderColor: '#000', borderRadius: 5, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  warningText: { fontSize: 8, fontWeight: 'bold', textTransform: 'uppercase' }
 });
 
-export const EscalaPDF = ({ schedule, unitName }) => (
+
+export const EscalaPDF = ({ schedule, unitName, warningMessage, monthName }) => (
+
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.watermark}>PRATIQUE FITNESS</Text>
@@ -45,8 +51,9 @@ export const EscalaPDF = ({ schedule, unitName }) => (
           <Image src={LogoPratique} style={styles.logo} />
           <Text style={styles.unit}>{unitName}</Text>
         </View>
-        <Text style={styles.title}>Escala de Final de Semana</Text>
+        <Text style={styles.title}>Escala de Final de Semana {monthName && `- ${monthName}`}</Text>
       </View>
+
 
       <View style={styles.table}>
         {/* HEADER */}
@@ -73,9 +80,16 @@ export const EscalaPDF = ({ schedule, unitName }) => (
         ))}
       </View>
 
+      {warningMessage && (
+        <View style={styles.warningContainer}>
+          <Text style={styles.warningText}>{warningMessage}</Text>
+        </View>
+      )}
+
       <Text style={{ marginTop: 20, textAlign: 'center', fontSize: 10, fontWeight: 'bold', color: '#e50914' }}>
         BOM TRABALHO EQUIPE! 💪
       </Text>
     </Page>
   </Document>
 );
+
