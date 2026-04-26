@@ -422,15 +422,14 @@ export default function App() {
 
         <div style={{ marginTop: 'auto', marginBottom: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px' }}>
           {warningMessage && (
-            <div style={{ width: '980px', padding: '40px', background: '#fff', border: '4px solid #000', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '30px', boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
-              <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: '#fff1f1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <FaCircleInfo style={{ fontSize: '40px', color: '#e50914' }} />
-              </div>
+            <div style={{ width: '980px', marginTop: '40px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <FaCircleInfo style={{ fontSize: '40px', color: '#e50914' }} />
               <span style={{ fontSize: '26px', fontWeight: 900, textTransform: 'uppercase', color: '#000', flex: 1 }}>
                 {warningMessage}
               </span>
             </div>
           )}
+
           <span style={{ fontSize: '36px', fontWeight: '900', color: '#e50914', textTransform: 'uppercase', letterSpacing: '4px' }}>
             Bom Trabalho Equipe! 💪
           </span>
