@@ -241,20 +241,17 @@ export default function App() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: '5px',
-                  marginBottom: '10px'
+                  marginBottom: '20px'
                 }}>
                   <img
                     src={logoPratique}
                     alt="Logo"
-                    style={{ height: '80px' }}
+                    style={{ height: '60px' }}
                   />
 
 
                   <span style={{ color: '#e50914', fontWeight: 900, fontSize: '1rem', letterSpacing: '2px', textTransform: 'uppercase' }}>{unitName}</span>
                 </div>
-                <h2 style={{ fontSize: '1.8rem', fontWeight: 900, textTransform: 'uppercase', color: theme.colors.primary, marginBottom: '5px', textAlign: 'center' }}>
-                  {unitName}
-                </h2>
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '30px', textAlign: 'center' }}>
                   Escala de Final de Semana do Mês de {monthName || '...'}
                 </h4>
