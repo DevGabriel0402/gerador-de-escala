@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   tableCol: { width: '20%', borderRightWidth: 1, borderColor: '#000', padding: 5, justifyContent: 'center', alignItems: 'center' },
   lastCol: { borderRightWidth: 0 },
 
-  headerText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center', color: 'white' },
+  headerText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center', color: '#ffffff' },
 
   cellText: { fontSize: 8, fontWeight: 'normal', textAlign: 'center' },
   dayText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase' },
