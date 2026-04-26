@@ -1,6 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
-import LogoApp from '../assets/logo.png';
+import LogoPratique from '../assets/Menor-PRATIQUE.png';
 
 
 
@@ -50,7 +50,7 @@ export const EscalaPDF = ({ schedule, unitName, warningMessage, monthName }) => 
 
       <View style={styles.header}>
         <View style={styles.logoContainer}>
-          <Image src={LogoApp} style={styles.logo} />
+          <Image src={LogoPratique} style={styles.logo} />
 
           <Text style={styles.unit}>{unitName}</Text>
         </View>
@@ -61,38 +61,38 @@ export const EscalaPDF = ({ schedule, unitName, warningMessage, monthName }) => 
       <View style={styles.table}>
         {/* HEADER */}
         <View style={[styles.tableRow, styles.tableHeader]}>
-          <View style={styles.tableColHeader}><Text style={styles.headerText}>DIA</Text></View>
-          <View style={styles.tableColHeader}><Text style={styles.headerText}>MUSCULAÇÃO{"\n"}(LOW)</Text></View>
-          <View style={styles.tableColHeader}><Text style={styles.headerText}>MUSCULAÇÃO{"\n"}PRIME</Text></View>
-          <View style={styles.tableColHeader}><Text style={styles.headerText}>TROCA LOW</Text></View>
-          <View style={[styles.tableColHeader, styles.lastCol]}><Text style={styles.headerText}>TROCA PRIME</Text></View>
-        </View>
-
-        {/* ROWS */}
-        {schedule.map((row) => (
-          <View key={row.id} style={row.highlight ? styles.tableRowHighlight : styles.tableRow}>
-            <View style={styles.tableCol}>
-              <Text style={styles.dateText}>{row.date}</Text>
-              <Text style={styles.dayText}>{row.day}</Text>
-            </View>
-            <View style={styles.tableCol}><Text style={styles.cellText}>{row.low}</Text></View>
-            <View style={styles.tableCol}><Text style={styles.cellText}>{row.prime}</Text></View>
-            <View style={styles.tableCol}><Text style={styles.cellText}>{row.trocaLow}</Text></View>
-            <View style={[styles.tableCol, styles.lastCol]}><Text style={styles.cellText}>{row.trocaPrime}</Text></View>
-          </View>
-        ))}
+          <View style={styles.tableColHeader}><Text style={styles.headerText, color: "#fff"}>DIA</Text></View>
+        <View style={styles.tableColHeader}><Text style={styles.headerText}>MUSCULAÇÃO{"\n"}(LOW)</Text></View>
+        <View style={styles.tableColHeader}><Text style={styles.headerText}>MUSCULAÇÃO{"\n"}PRIME</Text></View>
+        <View style={styles.tableColHeader}><Text style={styles.headerText}>TROCA LOW</Text></View>
+        <View style={[styles.tableColHeader, styles.lastCol]}><Text style={styles.headerText}>TROCA PRIME</Text></View>
       </View>
 
-      {warningMessage && (
-        <View style={styles.warningContainer}>
-          <Text style={styles.warningText}>{warningMessage}</Text>
+      {/* ROWS */}
+      {schedule.map((row) => (
+        <View key={row.id} style={row.highlight ? styles.tableRowHighlight : styles.tableRow}>
+          <View style={styles.tableCol}>
+            <Text style={styles.dateText}>{row.date}</Text>
+            <Text style={styles.dayText}>{row.day}</Text>
+          </View>
+          <View style={styles.tableCol}><Text style={styles.cellText}>{row.low}</Text></View>
+          <View style={styles.tableCol}><Text style={styles.cellText}>{row.prime}</Text></View>
+          <View style={styles.tableCol}><Text style={styles.cellText}>{row.trocaLow}</Text></View>
+          <View style={[styles.tableCol, styles.lastCol]}><Text style={styles.cellText}>{row.trocaPrime}</Text></View>
         </View>
-      )}
+      ))}
+    </View>
 
-      <Text style={{ marginTop: 20, textAlign: 'center', fontSize: 10, fontWeight: 'bold', color: '#e50914' }}>
-        BOM TRABALHO EQUIPE! 💪
-      </Text>
-    </Page>
-  </Document>
+    {warningMessage && (
+      <View style={styles.warningContainer}>
+        <Text style={styles.warningText}>{warningMessage}</Text>
+      </View>
+    )}
+
+    <Text style={{ marginTop: 20, textAlign: 'center', fontSize: 10, fontWeight: 'bold', color: '#e50914' }}>
+      BOM TRABALHO EQUIPE! 💪
+    </Text>
+  </Page>
+  </Document >
 );
 

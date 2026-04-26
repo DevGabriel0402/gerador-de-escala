@@ -27,6 +27,8 @@ import {
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { EscalaPDF } from './utils/EscalaPDF';
 import logoApp from './assets/logo.png';
+import logoPratique from './assets/Menor-PRATIQUE.png';
+
 
 
 const Main = styled.main`
@@ -245,10 +247,11 @@ export default function App() {
                   marginBottom: '10px'
                 }}>
                   <img
-                    src="logo.png"
+                    src={logoPratique}
                     alt="Logo"
-                    style={{ height: '140px' }}
+                    style={{ height: '100px' }}
                   />
+
 
                   <span style={{ color: '#e50914', fontWeight: 900, fontSize: '1rem', letterSpacing: '2px', textTransform: 'uppercase' }}>{unitName}</span>
                 </div>
@@ -364,7 +367,8 @@ export default function App() {
         </div>
 
         <div style={{ marginTop: '60px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <img src={logoApp} alt="Logo" style={{ height: '120px', marginBottom: '20px' }} />
+          <img src={logoPratique} alt="Logo" style={{ height: '140px', marginBottom: '20px' }} />
+
 
           <div style={{ margin: '40px 0' }}>
             <h1 style={{

@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FaCalendarAlt, FaUsers, FaDice, FaCog } from 'react-icons/fa';
+import logoApp from '../assets/logo.png';
+
 
 const NavContainer = styled.div`
   @media (max-width: 900px) {
@@ -153,7 +155,8 @@ export const Navbar = ({ activeTab, setActiveTab, unitName }) => {
       <TopHeader>
         <LogoSection>
           <div className="logo-box">
-            <img src="https://pratiquefitness.com.br/wp-content/uploads/2025/10/pratique-logo-academia.webp" alt="Pratique" />
+            <img src={logoApp} alt="Pratique" />
+
           </div>
         </LogoSection>
 
