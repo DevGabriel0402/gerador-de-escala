@@ -348,99 +348,98 @@ export default function App() {
         left: 0,
         width: '1080px',
         height: '1920px',
-        background: '#f8f9fa',
+        background: 'linear-gradient(180deg, #ffffff 0%, #f1f1f1 100%)',
         zIndex: -1000,
         flexDirection: 'column',
         alignItems: 'center',
         padding: '0',
-        borderTop: '40px solid #e50914',
-        borderBottom: '40px solid #e50914',
-        fontFamily: "'Inter', sans-serif"
+        fontFamily: "'Inter', sans-serif",
+        color: '#1a1a1a'
       }}>
-        <div style={{ marginTop: '80px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{
-            background: 'transparent',
-            padding: '20px',
-            borderRadius: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '10px',
-            marginBottom: '40px'
-          }}>
-            <img
-              src={logoPratique}
-              alt="Logo"
-              style={{ height: '120px' }}
-            />
-            <span style={{ color: '#e50914', fontWeight: 900, fontSize: '2rem', letterSpacing: '4px', textTransform: 'uppercase' }}>{unitName}</span>
-          </div>
-          <h1 style={{
-            fontSize: '52px',
-            fontWeight: '900',
-            textTransform: 'uppercase',
-            color: '#000',
-            lineHeight: '1.1',
-            margin: 0,
-            textAlign: 'center',
-            maxWidth: '900px'
-          }}>
-            ESCALA DE FINAL DE SEMANA DO MÊS DE {monthName || '...'}
-          </h1>
-
-          <div style={{ width: '180px', height: '12px', background: '#e50914', margin: '15px auto 0' }}></div>
+        {/* Top Decorative Bar */}
+        <div style={{ width: '100%', height: '80px', background: '#e50914', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ color: 'white', fontWeight: 900, fontSize: '24px', letterSpacing: '8px', textTransform: 'uppercase' }}>Escala Pratique</span>
         </div>
 
-        <div style={{ width: '960px', marginTop: '100px' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', border: '3px solid #000' }}>
-            <thead>
-              <tr style={{ background: '#fff' }}>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>DIA</th>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>MUSCULAÇÃO<br />(LOW)</th>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>MUSCULAÇÃO<br />PRIME</th>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>TROCA<br />LOW</th>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>TROCA<br />PRIME</th>
+        <div style={{ marginTop: '60px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <img src={logoPratique} alt="Logo" style={{ height: '140px', marginBottom: '20px' }} />
+          <h2 style={{ color: '#e50914', fontWeight: 900, fontSize: '2.5rem', letterSpacing: '4px', textTransform: 'uppercase', margin: 0 }}>{unitName}</h2>
+          
+          <div style={{ margin: '40px 0' }}>
+            <h1 style={{
+              fontSize: '56px',
+              fontWeight: '900',
+              textTransform: 'uppercase',
+              color: '#000',
+              lineHeight: '1',
+              margin: 0,
+              textAlign: 'center',
+              maxWidth: '900px'
+            }}>
+              ESCALA DE FINAL DE SEMANA
+            </h1>
+            <h3 style={{ fontSize: '32px', fontWeight: '900', color: '#666', marginTop: '10px', textTransform: 'uppercase' }}>
+              MÊS DE {monthName || '...'}
+            </h3>
+            <div style={{ width: '200px', height: '10px', background: '#e50914', margin: '20px auto 0', borderRadius: '10px' }}></div>
+          </div>
+        </div>
 
+        <div style={{ width: '980px', marginTop: '40px', background: 'white', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', border: '4px solid #000' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>DIA</th>
+                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>MUSCULAÇÃO<br />(LOW)</th>
+                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>MUSCULAÇÃO<br />PRIME</th>
+                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>TROCA<br />LOW</th>
+                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>TROCA<br />PRIME</th>
               </tr>
             </thead>
             <tbody>
               {schedule.map(row => (
                 <tr key={row.id} style={{ background: row.day === 'SÁBADO' ? '#fff1f1' : '#ffffff' }}>
-
                   <td style={{
-                    border: '2px solid #000',
-                    padding: '20px 10px',
+                    border: '1px solid #000',
+                    padding: '25px 10px',
                     fontWeight: '900',
-                    fontSize: '22px',
+                    fontSize: '24px',
                     textAlign: 'center',
                     lineHeight: '1.2'
                   }}>
-                    {row.date}<br />{row.day}
+                    <span style={{ fontSize: '28px' }}>{row.date}</span><br />
+                    <span style={{ fontSize: '20px', color: '#666' }}>{row.day}</span>
                   </td>
-                  <td style={{ border: '2px solid #000', padding: '20px 10px', fontSize: '24px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#1a2a3a' }}>{row.low}</td>
-                  <td style={{ border: '2px solid #000', padding: '20px 10px', fontSize: '24px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#1a2a3a' }}>{row.prime}</td>
-                  <td style={{ border: '2px solid #000', padding: '20px 10px', fontSize: '24px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#1a2a3a' }}>{row.trocaLow}</td>
-                  <td style={{ border: '2px solid #000', padding: '20px 10px', fontSize: '24px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#1a2a3a' }}>{row.trocaPrime}</td>
+                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#1a1a1a' }}>{row.low}</td>
+                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#1a1a1a' }}>{row.prime}</td>
+                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#666' }}>{row.trocaLow}</td>
+                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '900', textAlign: 'center', color: '#666' }}>{row.trocaPrime}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <div style={{ marginTop: 'auto', marginBottom: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+        <div style={{ marginTop: 'auto', marginBottom: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px' }}>
           {warningMessage && (
-            <div style={{ width: '960px', padding: '30px', border: '5px solid #000', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '30px' }}>
-              <FaCircleInfo style={{ fontSize: '3rem', color: '#e50914' }} />
-              <span style={{ fontSize: '24px', fontWeight: 900, textTransform: 'uppercase', color: '#000' }}>
+            <div style={{ width: '980px', padding: '40px', background: '#fff', border: '4px solid #000', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '30px', boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
+              <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: '#fff1f1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FaCircleInfo style={{ fontSize: '40px', color: '#e50914' }} />
+              </div>
+              <span style={{ fontSize: '26px', fontWeight: 900, textTransform: 'uppercase', color: '#000', flex: 1 }}>
                 {warningMessage}
               </span>
             </div>
           )}
-          <span style={{ fontSize: '32px', fontWeight: '900', color: '#666', textTransform: 'uppercase' }}>
-            BOM TRABALHO EQUIPE! 💪
+          <span style={{ fontSize: '36px', fontWeight: '900', color: '#e50914', textTransform: 'uppercase', letterSpacing: '4px' }}>
+            Bom Trabalho Equipe! 💪
           </span>
         </div>
+
+        {/* Bottom Decorative Bar */}
+        <div style={{ width: '100%', height: '40px', background: '#1a1a1a' }}></div>
       </div>
+
 
       {globalModal.isOpen && (
         <CustomModal 
