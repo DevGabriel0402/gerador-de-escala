@@ -103,7 +103,7 @@ export const EmployeeSelectionModal = ({ modal, onClose, employees, onSelect }) 
           </div>
           <button className="close" onClick={onClose}><FaXmark /></button>
         </Header>
-        
+
         <Content>
           {['professores', 'recepcao', 'bem_estar'].map(role => {
             const filtered = employees.filter(e => e.role === role);
