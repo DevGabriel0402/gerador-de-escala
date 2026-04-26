@@ -275,6 +275,26 @@ export const EscalaPage = ({
     });
   };
 
+  const handleDeleteSchedule = async () => {
+    setGlobalModal({
+      isOpen: true,
+      title: 'Excluir Escala',
+      message: 'Deseja excluir TODA a escala atual? Isso apagará todas as datas e nomes.',
+      type: 'danger',
+      onConfirm: async () => {
+        setGlobalModal(prev => ({ ...prev, isOpen: false }));
+        const loadingToast = toast.loading('Excluindo escala...');
+        try {
+          await clearSchedule(schedule);
+          toast.success('Escala excluída!', { id: loadingToast });
+        } catch (error) {
+          toast.error('Erro ao excluir', { id: loadingToast });
+        }
+      }
+    });
+  };
+
+
 
   const openModal = (rowId, field, dayName, fieldName, slotIndex = 0) => {
     const targetRole = field.toLowerCase().includes('prime') ? 'prime' : 'low';
@@ -334,9 +354,13 @@ export const EscalaPage = ({
           <Button $variant="danger" style={{ color: '#000' }} onClick={handleClearAllNames}>
             <FaEraser /> Limpar Nomes
           </Button>
+          <Button $variant="danger" style={{ color: '#fff' }} onClick={handleDeleteSchedule}>
+            <FaTrash /> Excluir Escala
+          </Button>
           <Button $variant="blue" onClick={() => setIsPreviewModalOpen(true)}>
             <FaEye /> Pré-visualizar & Exportar
           </Button>
+
         </div>
       </Actions>
 
