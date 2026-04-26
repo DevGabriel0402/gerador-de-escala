@@ -335,18 +335,12 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
             {schedule.map(row => (
               <tr key={row.id} className={row.highlight ? 'highlight' : ''}>
                 <td>
-                  {isEditing ? (
-                    <CellEdit>
-                      <input value={row.date} onChange={e => handleUpdate(row.id, 'date', e.target.value)} placeholder="00/00" />
-                      <input className="uppercase" value={row.day} onChange={e => handleUpdate(row.id, 'day', e.target.value)} placeholder="DIA" />
-                    </CellEdit>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span>{row.date}</span>
-                      <span className="uppercase">{row.day}</span>
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span>{row.date}</span>
+                    <span className="uppercase">{row.day}</span>
+                  </div>
                 </td>
+
                 
                 {['low', 'prime', 'trocaLow', 'trocaPrime'].map(field => {
                   const names = (row[field] || '').split('\n').filter(n => n.trim());
