@@ -37,7 +37,7 @@ const LogoSection = styled.div`
     min-width: 140px;
 
     img {
-      height: 54px;
+      height: 40px;
       object-fit: contain;
       filter: brightness(0) invert(1);
       @media (max-width: 900px) {
