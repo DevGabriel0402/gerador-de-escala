@@ -194,7 +194,8 @@ const ResultBox = styled.div`
   }
 `;
 
-export const SorteioPage = ({ employees, draftedEmployees }) => {
+export const SorteioPage = ({ employees, draftedEmployees, setGlobalModal }) => {
+
   const [form, setForm] = useState({ title: '', date: '', qtdLow: 1, qtdPrime: 1 });
   const [result, setResult] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -207,13 +208,26 @@ export const SorteioPage = ({ employees, draftedEmployees }) => {
     }
 
     const draftedNames = draftedEmployees.map(e => typeof e === 'string' ? e : e.name);
-    const available = employees.map(e => e.name).filter(n => !draftedNames.includes(n));
-    const total = (parseInt(form.qtdLow) || 0) + (parseInt(form.qtdPrime) || 0);
+    
+    const availableLow = employees
+      .filter(e => e.role === 'low')
+      .map(e => e.name)
+      .filter(n => !draftedNames.includes(n));
+      
+    const availablePrime = employees
+      .filter(e => e.role === 'prime')
+      .map(e => e.name)
+      .filter(n => !draftedNames.includes(n));
 
-    if (total > available.length) {
-      toast.error(`Vagas (${total}) > Funcionários disponíveis (${available.length})`);
+    if (form.qtdLow > availableLow.length) {
+      toast.error(`Vagas LOW (${form.qtdLow}) > Disponíveis (${availableLow.length})`);
       return;
     }
+    if (form.qtdPrime > availablePrime.length) {
+      toast.error(`Vagas PRIME (${form.qtdPrime}) > Disponíveis (${availablePrime.length})`);
+      return;
+    }
+
 
     setIsDrawing(true);
     setResult(null);
@@ -226,9 +240,12 @@ export const SorteioPage = ({ employees, draftedEmployees }) => {
       if (count === 0) {
         clearInterval(timer);
         setIsDrawing(false);
-        const shuffled = [...available].sort(() => 0.5 - Math.random());
-        const lows = shuffled.slice(0, form.qtdLow);
-        const primes = shuffled.slice(form.qtdLow, total);
+        const shuffledLow = [...availableLow].sort(() => 0.5 - Math.random());
+        const shuffledPrime = [...availablePrime].sort(() => 0.5 - Math.random());
+        
+        const lows = shuffledLow.slice(0, form.qtdLow);
+        const primes = shuffledPrime.slice(0, form.qtdPrime);
+
         
         const newResult = { title: form.title, date: form.date, lows, primes };
         setResult(newResult);
@@ -244,11 +261,19 @@ export const SorteioPage = ({ employees, draftedEmployees }) => {
   };
 
   const handleResetHistory = async () => {
-    if (confirm('Zerar o histórico de quem já trabalhou?')) {
-      await updateSettings({ draftedEmployees: [] });
-      toast.success('Histórico zerado');
-    }
+    setGlobalModal({
+      isOpen: true,
+      title: 'Zerar Histórico',
+      message: 'Deseja zerar o histórico de sorteios realizados?',
+      type: 'danger',
+      onConfirm: async () => {
+        await updateSettings({ draftedEmployees: [] });
+        toast.success('Histórico zerado');
+        setGlobalModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
+
 
   return (
     <Container>

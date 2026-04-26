@@ -130,7 +130,8 @@ export default function App() {
 
         )}
         {activeTab === 'equipe' && <EquipePage employees={employees} />}
-        {activeTab === 'sorteio' && <SorteioPage employees={employees} draftedEmployees={draftedEmployees} />}
+        {activeTab === 'sorteio' && <SorteioPage employees={employees} draftedEmployees={draftedEmployees} setGlobalModal={setGlobalModal} />}
+
         {activeTab === 'ajustes' && (
           <Card style={{ maxWidth: '600px' }}>
             <h2 style={{ fontWeight: 900, marginBottom: '2rem' }}>Configurações</h2>
