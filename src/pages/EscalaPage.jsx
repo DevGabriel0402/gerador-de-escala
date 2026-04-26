@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { 
   FaCalendarPlus, FaEdit, FaSave, FaPlus, FaEye, FaTrash, 
-  FaPalette, FaPlusCircle, FaEraser
+  FaPalette, FaPlusCircle, FaEraser, FaChevronLeft, FaChevronRight 
 } from 'react-icons/fa';
 import { FaArrowRightArrowLeft, FaShuffle } from 'react-icons/fa6';
 import { Card, Button, IconButton } from '../styles/components';
@@ -27,6 +27,33 @@ const Actions = styled.div`
 
   .left { display: flex; flex-direction: column; gap: 4px; }
   .right { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+`;
+
+const MonthNavigator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #eee;
+    color: ${props => props.theme.colors.primary};
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: ${props => props.theme.shadows.soft};
+    
+    &:hover {
+      background: ${props => props.theme.colors.primary};
+      color: #fff;
+      transform: translateY(-2px);
+    }
+  }
 `;
 
 const TableContainer = styled(Card)`
@@ -131,20 +158,30 @@ export const EscalaPage = ({
   setIsPreviewModalOpen,
   warningMessage,
   monthName,
-  setGlobalModal
+  setGlobalModal,
+  currentMonthId,
+  setCurrentMonthId
 }) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [modal, setModal] = useState({ isOpen: false, rowId: null, field: null, dayName: '', fieldName: '', swapStep: 1, firstEmployee: null, targetRole: null, slotIndex: 0 });
 
+  const handlePrevMonth = () => {
+    const [year, month] = currentMonthId.split('-').map(Number);
+    const date = new Date(year, month - 2, 1);
+    setCurrentMonthId(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
+  };
 
-
-
+  const handleNextMonth = () => {
+    const [year, month] = currentMonthId.split('-').map(Number);
+    const date = new Date(year, month, 1);
+    setCurrentMonthId(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
+  };
 
   const handleUpdate = async (id, field, value) => {
     const row = schedule.find(r => r.id === id);
     if (row) {
-      await saveScheduleRow({ ...row, [field]: value }, schedule.indexOf(row));
+      await saveScheduleRow({ ...row, [field]: value }, schedule.indexOf(row), currentMonthId);
     }
   };
 
@@ -236,7 +273,7 @@ export const EscalaPage = ({
               prime: primeValue,
               trocaLow: '',
               trocaPrime: ''
-            }, i);
+            }, i, currentMonthId);
           }
 
           toast.success('Escala gerada!', { id: loadingToast });
@@ -265,7 +302,7 @@ export const EscalaPage = ({
               prime: '',
               trocaLow: '',
               trocaPrime: ''
-            }, i);
+            }, i, currentMonthId);
           }
           toast.success('Nomes removidos!', { id: loadingToast });
         } catch (error) {
@@ -275,24 +312,6 @@ export const EscalaPage = ({
     });
   };
 
-  const handleDeleteSchedule = async () => {
-    setGlobalModal({
-      isOpen: true,
-      title: 'Excluir Escala',
-      message: 'Deseja excluir TODA a escala atual? Isso apagará todas as datas e nomes.',
-      type: 'danger',
-      onConfirm: async () => {
-        setGlobalModal(prev => ({ ...prev, isOpen: false }));
-        const loadingToast = toast.loading('Excluindo escala...');
-        try {
-          await clearSchedule(schedule);
-          toast.success('Escala excluída!', { id: loadingToast });
-        } catch (error) {
-          toast.error('Erro ao excluir', { id: loadingToast });
-        }
-      }
-    });
-  };
 
 
 
@@ -336,13 +355,21 @@ export const EscalaPage = ({
     <Container>
       <Actions className="no-print">
         <div className="left">
-          <h2 style={{ fontWeight: 900 }}>Escala de Final de Semana {monthName && `- ${monthName}`}</h2>
-          <p style={{ color: '#999', fontSize: '0.9rem' }}>Gerencie o plantão da sua unidade.</p>
+          <MonthNavigator>
+            <button className="nav-btn" onClick={handlePrevMonth} title="Mês Anterior">
+              <FaChevronLeft />
+            </button>
+            <h2 style={{ fontWeight: 900 }}>{monthName}</h2>
+            <button className="nav-btn" onClick={handleNextMonth} title="Próximo Mês">
+              <FaChevronRight />
+            </button>
+          </MonthNavigator>
+          <p style={{ color: '#999', fontSize: '0.9rem' }}>Gerencie o plantão da sua unidade para este mês.</p>
         </div>
 
         <div className="right">
           <Button $variant="purple" onClick={() => setIsMonthModalOpen(true)}>
-            <FaCalendarPlus /> Nova Escala Mensal
+            <FaCalendarPlus /> Gerar Escala Anual
           </Button>
           <Button $variant={isEditing ? 'success' : 'blue'} onClick={() => setIsEditing(!isEditing)}>
             {isEditing ? <><FaSave /> Salvar Edição</> : <><FaEdit /> Editar Escala</>}
@@ -355,9 +382,6 @@ export const EscalaPage = ({
             <FaEraser /> Limpar Nomes
           </Button>
 
-          <Button $variant="danger" style={{ color: '#fff' }} onClick={handleDeleteSchedule}>
-            <FaTrash /> Excluir Escala
-          </Button>
           <Button $variant="blue" onClick={() => setIsPreviewModalOpen(true)}>
             <FaEye /> Pré-visualizar & Exportar
           </Button>
@@ -374,7 +398,6 @@ export const EscalaPage = ({
               <th>Musculação PRIME</th>
               <th>Troca LOW</th>
               <th>Troca PRIME</th>
-              {isEditing && <th className="no-print">Ações</th>}
             </tr>
           </thead>
           <tbody>
@@ -442,15 +465,6 @@ export const EscalaPage = ({
                 })}
 
 
-                {isEditing && (
-                  <td className="no-print">
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
-                      <IconButton onClick={() => handleToggleHighlight(row.id)} title="Destaque"><FaPalette /></IconButton>
-                      <IconButton onClick={() => handleDeleteRow(row.id)} $hoverColor="#e50914" title="Remover"><FaTrash /></IconButton>
-
-                    </div>
-                  </td>
-                )}
               </tr>
             ))}
           </tbody>

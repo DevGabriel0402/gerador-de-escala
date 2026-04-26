@@ -21,6 +21,7 @@ import {
   subscribeSettings,
   updateSettings,
   clearSchedule,
+  deleteAllSchedules,
   saveScheduleRow
 } from './services/firestore';
 
@@ -72,22 +73,25 @@ export default function App() {
   const [draftedEmployees, setDraftedEmployees] = useState([]);
 
   const [isMonthModalOpen, setIsMonthModalOpen] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   const [warningMessage, setWarningMessage] = useState('Chegar com 20 minutos de antecedência para preparar o ambiente da academia.');
-  const [monthName, setMonthName] = useState('');
+  const now = new Date();
+  const initialMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const [currentMonthId, setCurrentMonthId] = useState(initialMonth);
   const [globalModal, setGlobalModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => { }, type: 'info', isAlert: false });
+
+  const computedMonthName = new Date(currentMonthId + '-02').toLocaleString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase();
 
 
   useEffect(() => {
     const unsubEmployees = subscribeEmployees(setEmployees);
-    const unsubSchedule = subscribeSchedule(setSchedule);
+    const unsubSchedule = subscribeSchedule(currentMonthId, setSchedule);
     const unsubSettings = subscribeSettings((data) => {
       setUnitName(data.unitName || 'MANGABEIRAS');
       setDraftedEmployees(data.draftedEmployees || []);
       setWarningMessage(data.warningMessage || 'Chegar com 20 minutos de antecedência para preparar o ambiente da academia.');
-      setMonthName(data.monthName || '');
       setIsLoading(false);
     });
 
@@ -97,7 +101,7 @@ export default function App() {
       unsubSchedule();
       unsubSettings();
     };
-  }, []);
+  }, [currentMonthId]);
 
   if (isLoading) {
     return (
@@ -126,8 +130,10 @@ export default function App() {
             setIsMonthModalOpen={setIsMonthModalOpen}
             setIsPreviewModalOpen={setIsPreviewModalOpen}
             warningMessage={warningMessage}
-            monthName={monthName}
+            monthName={computedMonthName}
             setGlobalModal={setGlobalModal}
+            currentMonthId={currentMonthId}
+            setCurrentMonthId={setCurrentMonthId}
           />
 
         )}
@@ -168,38 +174,67 @@ export default function App() {
 
       </Main>
 
-      {/* MODAL MÊS */}
+      {/* MODAL ANO */}
       {isMonthModalOpen && (
         <ModalOverlay className="modal-overlay" onClick={() => setIsMonthModalOpen(false)}>
           <ModalContent onClick={e => e.stopPropagation()}>
-            <h3>Nova Escala Mensal</h3>
-            <p>Escolha o mês. A escala atual será <span style={{ color: 'red', fontWeight: 900 }}>limpa</span>.</p>
-            <input type="month" value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} />
+            <h3>Gerar Escala Anual</h3>
+            <p>Escolha o ano. Isso criará escalas para <span style={{ color: 'red', fontWeight: 900 }}>todos os meses</span>. As escalas existentes serão apagadas.</p>
+            <input 
+              type="number" 
+              value={selectedYear} 
+              onChange={e => setSelectedYear(e.target.value)} 
+              min="2024" 
+              max="2100"
+              style={{ textAlign: 'center' }}
+            />
             <div className="footer">
               <Button $variant="outline" style={{ flex: 1 }} onClick={() => setIsMonthModalOpen(false)}>Cancelar</Button>
-              <Button $variant="primary" style={{ flex: 1 }} disabled={!selectedMonth} onClick={async () => {
-                // Lógica de gerar mês (integrada aqui para simplificar)
-                setIsLoading(true);
-                const [year, month] = selectedMonth.split('-');
-                const monthNameValue = new Date(year, month - 1, 1).toLocaleString('pt-BR', { month: 'long' });
-                await updateSettings({ monthName: monthNameValue });
-                const daysInMonth = new Date(year, month, 0).getDate();
-                let rowId = Date.now();
-                for (let day = 1; day <= daysInMonth; day++) {
-                  const date = new Date(year, month - 1, day);
-                  if (date.getDay() === 0 || date.getDay() === 6) {
-                    await saveScheduleRow({
-                      id: rowId++,
-                      date: `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`,
-                      day: date.getDay() === 6 ? 'SÁBADO' : 'DOMINGO',
-                      low: '', prime: '', trocaLow: '', trocaPrime: '', highlight: date.getDay() === 6
-                    }, day);
+              <Button $variant="primary" style={{ flex: 1 }} onClick={async () => {
+                setGlobalModal({
+                  isOpen: true,
+                  title: 'Confirmar Escala Anual',
+                  message: `Deseja apagar TODAS as escalas existentes e gerar uma nova escala para todo o ano de ${selectedYear}?`,
+                  type: 'danger',
+                  onConfirm: async () => {
+                    setGlobalModal(prev => ({ ...prev, isOpen: false }));
+                    setIsLoading(true);
+                    const loadingToast = toast.loading(`Gerando escala para ${selectedYear}...`);
+                    
+                    try {
+                      await deleteAllSchedules();
+                      
+                      let totalRows = 0;
+                      for (let month = 1; month <= 12; month++) {
+                        const monthId = `${selectedYear}-${String(month).padStart(2, '0')}`;
+                        const daysInMonth = new Date(selectedYear, month, 0).getDate();
+                        
+                        for (let day = 1; day <= daysInMonth; day++) {
+                          const date = new Date(selectedYear, month - 1, day);
+                          if (date.getDay() === 0 || date.getDay() === 6) {
+                            await saveScheduleRow({
+                              id: Date.now() + totalRows, // ID único
+                              date: `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`,
+                              day: date.getDay() === 6 ? 'SÁBADO' : 'DOMINGO',
+                              low: '', prime: '', trocaLow: '', trocaPrime: '', highlight: date.getDay() === 6
+                            }, day, monthId);
+                            totalRows++;
+                          }
+                        }
+                      }
+                      
+                      toast.success(`Escala anual de ${selectedYear} gerada!`, { id: loadingToast });
+                      setIsMonthModalOpen(false);
+                      setIsLoading(false);
+                      // Opcional: mudar para janeiro do ano gerado
+                      setCurrentMonthId(`${selectedYear}-01`);
+                    } catch (error) {
+                      toast.error('Erro ao gerar escala anual', { id: loadingToast });
+                      setIsLoading(false);
+                    }
                   }
-                }
-                setIsMonthModalOpen(false);
-                setIsLoading(false);
+                });
               }}>Gerar Agora</Button>
-
             </div>
           </ModalContent>
         </ModalOverlay>
@@ -253,7 +288,7 @@ export default function App() {
                   <span style={{ color: '#e50914', fontWeight: 900, fontSize: '1rem', letterSpacing: '2px', textTransform: 'uppercase' }}>{unitName}</span>
                 </div>
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '30px', textAlign: 'center' }}>
-                  Escala de Final de Semana do Mês de {monthName || '...'}
+                  Escala de Final de Semana do Mês de {computedMonthName || '...'}
                 </h4>
 
 
@@ -312,128 +347,102 @@ export default function App() {
                 <FaPrint /> Imprimir Escala
               </Button>
 
+
               <Button
                 $variant="primary"
-                style={{ flex: 1, background: theme.colors.blue }}
+                style={{ flex: 1, background: theme.colors.navy }}
                 onClick={async () => {
-                  const element = document.getElementById('export-image-area');
+                  const element = document.getElementById('export-a4-area');
                   if (element) {
-                    element.style.display = 'flex';
+                    element.style.visibility = 'visible';
+                    // Pequeno delay para garantir o layout
+                    await new Promise(r => setTimeout(r, 100));
+
                     const canvas = await html2canvas(element, {
-                      width: 1080,
-                      height: 1920,
-                      scale: 2,
                       useCORS: true,
-                      allowTaint: true
+                      allowTaint: true,
+                      scale: 2
                     });
-                    element.style.display = 'none';
+                    
+                    element.style.visibility = 'hidden';
                     const link = document.createElement('a');
-                    link.download = `Escala-${unitName}-Story.png`;
+                    link.download = `Escala-${unitName}-A4.png`;
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                   }
                 }}
               >
-                <FaImage /> Baixar Foto (Instagram)
+                <FaImage /> Baixar Imagem
               </Button>
             </div>
           </ModalContent>
         </ModalOverlay>
       )}
-      {/* AREA OCULTA PARA EXPORTAÇÃO DE IMAGEM (STORY) */}
-      <div id="export-image-area" style={{
-        display: 'none',
+
+      {/* AREA OCULTA PARA EXPORTAÇÃO DE IMAGEM (A4) */}
+      <div id="export-a4-area" style={{
+        visibility: 'hidden',
         position: 'fixed',
         top: 0,
-        left: 0,
-        width: '1080px',
-        height: '1920px',
-        background: 'linear-gradient(180deg, #ffffff 0%, #f1f1f1 100%)',
-        zIndex: -1000,
+        left: '-5000px', // Fora da tela
+        width: '1240px',
+        height: '1754px',
+        background: '#fff',
+        zIndex: -1001,
+        display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: '0',
+        padding: '60px',
         fontFamily: "'Inter', sans-serif",
-        color: '#1a1a1a'
+        color: '#000'
       }}>
-        {/* Top Decorative Bar */}
-        <div style={{ width: '100%', height: '80px', background: '#e50914', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ color: 'white', fontWeight: 900, fontSize: '24px', letterSpacing: '8px', textTransform: 'uppercase' }}>Escala Pratique {unitName}</span>
-        </div>
-
-        <div style={{ marginTop: '60px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <img src={logoPratique} alt="Logo" style={{ height: '140px', marginBottom: '20px' }} />
-
-
-          <div style={{ margin: '40px 0' }}>
-            <h1 style={{
-              fontSize: '44px',
-              fontWeight: '900',
-              textTransform: 'uppercase',
-              color: '#000',
-              lineHeight: '1',
-              margin: 0,
-              textAlign: 'center',
-              maxWidth: '900px'
-            }}>
-              ESCALA DE FINAL DE SEMANA MÊS DE {monthName || '...'}
-            </h1>
-            <div style={{ width: '200px', height: '10px', background: '#e50914', margin: '20px auto 0', borderRadius: '10px' }}></div>
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+          <img src={logoPratique} alt="Logo" style={{ height: '80px' }} />
+          <div style={{ textAlign: 'right' }}>
+            <h2 style={{ color: '#e50914', fontWeight: 900, margin: 0, fontSize: '32px' }}>{unitName}</h2>
+            <p style={{ margin: 0, fontWeight: 900, fontSize: '18px' }}>ESCALA DE FINAL DE SEMANA</p>
           </div>
         </div>
 
-        <div style={{ width: '980px', marginTop: '20px', background: 'white', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', border: '4px solid #000' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>DIA</th>
-                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>MUSCULAÇÃO<br />(LOW)</th>
-                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>MUSCULAÇÃO<br />PRIME</th>
-                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>TROCA<br />LOW</th>
-                <th style={{ border: '2px solid #000', padding: '30px 10px', fontWeight: '900', fontSize: '26px', background: '#e50914', color: 'white' }}>TROCA<br />PRIME</th>
+        <h1 style={{ fontSize: '36px', fontWeight: 900, textAlign: 'center', marginBottom: '40px', textTransform: 'uppercase' }}>
+          MÊS DE {computedMonthName || '...'}
+        </h1>
+
+        <table style={{ width: '100%', borderCollapse: 'collapse', border: '3px solid #000' }}>
+          <thead>
+            <tr>
+              <th style={{ border: '2px solid #000', padding: '15px', background: '#e50914', color: 'white', fontWeight: 900, fontSize: '20px' }}>DIA</th>
+              <th style={{ border: '2px solid #000', padding: '15px', background: '#e50914', color: 'white', fontWeight: 900, fontSize: '20px' }}>MUSCULAÇÃO (LOW)</th>
+              <th style={{ border: '2px solid #000', padding: '15px', background: '#e50914', color: 'white', fontWeight: 900, fontSize: '20px' }}>MUSCULAÇÃO PRIME</th>
+              <th style={{ border: '2px solid #000', padding: '15px', background: '#e50914', color: 'white', fontWeight: 900, fontSize: '20px' }}>TROCA LOW</th>
+              <th style={{ border: '2px solid #000', padding: '15px', background: '#e50914', color: 'white', fontWeight: 900, fontSize: '20px' }}>TROCA PRIME</th>
+            </tr>
+          </thead>
+          <tbody>
+            {schedule.map(row => (
+              <tr key={row.id}>
+                <td style={{ border: '2px solid #000', padding: '15px', fontWeight: 900, textAlign: 'center', background: '#fff1f1', fontSize: '18px' }}>
+                  {row.date}<br />{row.day}
+                </td>
+                <td style={{ border: '2px solid #000', padding: '15px', textAlign: 'center', fontSize: '18px', fontWeight: 600, whiteSpace: 'pre-wrap' }}>{row.low}</td>
+                <td style={{ border: '2px solid #000', padding: '15px', textAlign: 'center', fontSize: '18px', fontWeight: 600, whiteSpace: 'pre-wrap' }}>{row.prime}</td>
+                <td style={{ border: '2px solid #000', padding: '15px', textAlign: 'center', fontSize: '16px', color: '#666', whiteSpace: 'pre-wrap' }}>{row.trocaLow}</td>
+                <td style={{ border: '2px solid #000', padding: '15px', textAlign: 'center', fontSize: '16px', color: '#666', whiteSpace: 'pre-wrap' }}>{row.trocaPrime}</td>
               </tr>
-            </thead>
-            <tbody>
-              {schedule.map(row => (
-                <tr key={row.id} style={{ background: row.day === 'SÁBADO' ? '#fff1f1' : '#ffffff' }}>
-                  <td style={{
-                    border: '1px solid #000',
-                    padding: '25px 10px',
-                    fontWeight: '900',
-                    fontSize: '24px',
-                    textAlign: 'center',
-                    lineHeight: '1.2'
-                  }}>
-                    <span style={{ fontSize: '28px' }}>{row.date}</span><br />
-                    <span style={{ fontSize: '20px', color: '#666' }}>{row.day}</span>
-                  </td>
-                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '500', textAlign: 'center', color: '#1a1a1a' }}>{row.low}</td>
-                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '500', textAlign: 'center', color: '#1a1a1a' }}>{row.prime}</td>
-                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '500', textAlign: 'center', color: '#666' }}>{row.trocaLow}</td>
-                  <td style={{ border: '1px solid #000', padding: '20px 10px', fontSize: '26px', whiteSpace: 'pre-wrap', fontWeight: '500', textAlign: 'center', color: '#666' }}>{row.trocaPrime}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            ))}
+          </tbody>
+        </table>
+
+        {warningMessage && (
+          <div style={{ marginTop: '40px', padding: '20px', border: '2px solid #e50914', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '20px', width: '100%' }}>
+            <FaCircleInfo style={{ fontSize: '30px', color: '#e50914' }} />
+            <span style={{ fontSize: '18px', fontWeight: 900, textTransform: 'uppercase' }}>{warningMessage}</span>
+          </div>
+        )}
+
+        <div style={{ marginTop: 'auto', textAlign: 'center', width: '100%', borderTop: '2px solid #eee', paddingTop: '20px' }}>
+          <p style={{ fontWeight: 900, color: '#e50914', fontSize: '20px', letterSpacing: '2px' }}>PRATIQUE FITNESS - A MAIOR REDE DE MINAS</p>
         </div>
-
-        <div style={{ marginTop: 'auto', marginBottom: '80px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px' }}>
-          {warningMessage && (
-            <div style={{ width: '980px', marginTop: '40px', display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <FaCircleInfo style={{ fontSize: '40px', color: '#e50914' }} />
-              <span style={{ fontSize: '26px', fontWeight: 900, textTransform: 'uppercase', color: '#000', flex: 1 }}>
-                {warningMessage}
-              </span>
-            </div>
-          )}
-
-          <span style={{ fontSize: '36px', fontWeight: '900', color: '#e50914', textTransform: 'uppercase', letterSpacing: '4px' }}>
-            Bom Trabalho Equipe! 💪
-          </span>
-        </div>
-
-        {/* Bottom Decorative Bar */}
-        <div style={{ width: '100%', height: '40px', background: '#1a1a1a' }}></div>
       </div>
 
 

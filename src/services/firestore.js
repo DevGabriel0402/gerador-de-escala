@@ -7,7 +7,8 @@ import {
   deleteDoc, 
   onSnapshot,
   query,
-  orderBy
+  orderBy,
+  where
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
@@ -47,22 +48,39 @@ export const deleteEmployee = async (id) => {
 };
 
 // --- ESCALAS ---
-export const subscribeSchedule = (callback) => {
-  const q = query(collection(db, COLECAO_ESCALAS), orderBy("order", "asc"));
+export const subscribeSchedule = (monthId, callback) => {
+  // Buscamos a coleção e filtramos/ordenamos na memória para evitar a necessidade de criar índices compostos no console do Firebase
+  const q = query(collection(db, COLECAO_ESCALAS));
+    
   return onSnapshot(q, (snapshot) => {
-    const schedule = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    let schedule = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    if (monthId) {
+      schedule = schedule.filter(row => row.monthId === monthId);
+    }
+    
+    schedule.sort((a, b) => (a.order || 0) - (b.order || 0));
+    
     callback(schedule);
   });
 };
 
-export const saveScheduleRow = async (row, order) => {
+export const saveScheduleRow = async (row, order, monthId) => {
   const docRef = doc(db, COLECAO_ESCALAS, row.id.toString());
-  await setDoc(docRef, { ...row, order });
+  await setDoc(docRef, { ...row, order, monthId });
 };
 
 export const clearSchedule = async (schedule) => {
   for (const row of schedule) {
     await deleteDoc(doc(db, COLECAO_ESCALAS, row.id.toString()));
+  }
+};
+
+export const deleteAllSchedules = async () => {
+  const q = collection(db, COLECAO_ESCALAS);
+  const snapshot = await getDocs(q);
+  for (const docSnap of snapshot.docs) {
+    await deleteDoc(docSnap.ref);
   }
 };
 
