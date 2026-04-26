@@ -351,9 +351,10 @@ export const EscalaPage = ({
           <Button $variant="dark" onClick={handleRandomGeneration}>
             <FaShuffle /> Sorteio Aleatório
           </Button>
-          <Button $variant="danger" style={{ color: '#000' }} onClick={handleClearAllNames}>
+          <Button $variant="danger" onClick={handleClearAllNames}>
             <FaEraser /> Limpar Nomes
           </Button>
+
           <Button $variant="danger" style={{ color: '#fff' }} onClick={handleDeleteSchedule}>
             <FaTrash /> Excluir Escala
           </Button>
