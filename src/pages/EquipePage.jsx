@@ -5,7 +5,9 @@ import { FaPlus, FaTrash, FaDumbbell, FaStar } from 'react-icons/fa';
 
 import { Card, Button, IconButton } from '../styles/components';
 import { saveEmployee, deleteEmployee } from '../services/firestore';
+import { CustomAccordionSelect } from '../components/CustomAccordionSelect';
 import toast from 'react-hot-toast';
+
 
 const Container = styled.div`
   display: flex;
@@ -32,13 +34,7 @@ const Input = styled.input`
   font-weight: bold;
 `;
 
-const Select = styled.select`
-  padding: 0.8rem 1rem;
-  border: 1px solid ${props => props.theme.colors.gray.medium};
-  border-radius: ${props => props.theme.radius.medium};
-  background: white;
-  font-weight: bold;
-`;
+
 
 const TabsContainer = styled.div`
   display: flex;
@@ -161,10 +157,15 @@ export const EquipePage = ({ employees }) => {
             onChange={e => setName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAdd()}
           />
-          <Select value={role} onChange={e => setRole(e.target.value)}>
-            <option value="low">🔴 MUSCULAÇÃO LOW</option>
-            <option value="prime">🔵 MUSCULAÇÃO PRIME</option>
-          </Select>
+          <CustomAccordionSelect 
+            value={role} 
+            onChange={e => setRole(e.target.value)}
+            options={[
+              { value: 'low', label: '🔴 MUSCULAÇÃO LOW' },
+              { value: 'prime', label: '🔵 MUSCULAÇÃO PRIME' }
+            ]}
+          />
+
 
           <Button $variant="primary" onClick={handleAdd}>
             + Adicionar
