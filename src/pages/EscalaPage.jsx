@@ -63,7 +63,8 @@ const Table = styled.table`
     }
   }
 
-  tr.highlight { background-color: #f1f1f1; }
+  tr.highlight { background-color: #fff1f1; }
+
   
   /* Linha separadora de dias no estilo do PDF */
   .day-cell {

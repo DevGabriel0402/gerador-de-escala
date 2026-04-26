@@ -242,7 +242,8 @@ export default function App() {
                   <tbody>
                     {schedule.map(row => (
                       <tr key={row.id}>
-                        <td style={{ border: '1px solid #000', padding: '8px', fontWeight: 900, background: '#eee', textAlign: 'center' }}>
+                        <td style={{ border: '1px solid #000', padding: '8px', fontWeight: 900, background: '#fff1f1', textAlign: 'center' }}>
+
                           {row.date}<br />{row.day}
                         </td>
                         <td style={{ border: '1px solid #000', padding: '8px', fontSize: '0.8rem', whiteSpace: 'pre-wrap', textAlign: 'center' }}>{row.low}</td>
@@ -354,7 +355,8 @@ export default function App() {
             </thead>
             <tbody>
               {schedule.map(row => (
-                <tr key={row.id} style={{ background: row.day === 'SÁBADO' ? '#b0b0b0' : '#ffffff' }}>
+                <tr key={row.id} style={{ background: row.day === 'SÁBADO' ? '#fff1f1' : '#ffffff' }}>
+
                   <td style={{
                     border: '2px solid #000',
                     padding: '20px 10px',
