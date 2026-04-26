@@ -123,7 +123,8 @@ const AddBtn = styled.button`
 
 export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPreviewModalOpen }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [modal, setModal] = useState({ isOpen: false, rowId: null, field: null, dayName: '', fieldName: '', swapStep: 1, firstEmployee: null, targetRole: null });
+  const [modal, setModal] = useState({ isOpen: false, rowId: null, field: null, dayName: '', fieldName: '', swapStep: 1, firstEmployee: null, targetRole: null, slotIndex: 0 });
+
 
 
   const handleAddRow = async () => {
@@ -250,10 +251,11 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
     }
   };
 
-  const openModal = (rowId, field, dayName, fieldName) => {
+  const openModal = (rowId, field, dayName, fieldName, slotIndex = 0) => {
     const targetRole = field.toLowerCase().includes('prime') ? 'prime' : 'low';
-    setModal({ isOpen: true, rowId, field, dayName, fieldName, swapStep: 1, firstEmployee: null, targetRole });
+    setModal({ isOpen: true, rowId, field, dayName, fieldName, swapStep: 1, firstEmployee: null, targetRole, slotIndex });
   };
+
 
 
   const onSelectEmployee = async (name) => {
@@ -270,12 +272,20 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
         setModal({ ...modal, isOpen: false });
       }
     } else {
-      const current = row[modal.field];
-      const newValue = current ? `${current}\n${name}` : name;
-      await handleUpdate(modal.rowId, modal.field, newValue);
+      const current = row[modal.field] || '';
+      const names = current.split('\n').filter(n => n.trim());
+      
+      if (modal.slotIndex !== undefined) {
+        names[modal.slotIndex] = name;
+        await handleUpdate(modal.rowId, modal.field, names.join('\n'));
+      } else {
+        const newValue = current ? `${current}\n${name}` : name;
+        await handleUpdate(modal.rowId, modal.field, newValue);
+      }
       setModal({ ...modal, isOpen: false });
     }
   };
+
 
   return (
     <Container>
@@ -337,27 +347,59 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
                   )}
                 </td>
                 
-                {['low', 'prime', 'trocaLow', 'trocaPrime'].map(field => (
-                  <td key={field}>
-                    {isEditing ? (
-                      <CellEdit>
-                        <AddBtn 
-                          type={field.startsWith('troca') ? 'swap' : 'add'} 
-                          onClick={() => openModal(row.id, field, row.day, field.toUpperCase())}
-                        >
-                          {field.startsWith('troca') ? <FaArrowRightArrowLeft /> : <FaPlusCircle />}
-                          {field.startsWith('troca') ? 'Add Troca' : row.day === 'SÁBADO' && field === 'low' ? 'Adicionar (2 vagas)' : 'Adicionar (1 vaga)'}
-                        </AddBtn>
-                        <textarea 
-                          value={row[field]} 
-                          onChange={e => handleUpdate(row.id, field, e.target.value)}
-                        />
-                      </CellEdit>
-                    ) : (
-                      <div style={{ whiteSpace: 'pre-wrap' }}>{row[field]}</div>
-                    )}
-                  </td>
-                ))}
+                {['low', 'prime', 'trocaLow', 'trocaPrime'].map(field => {
+                  const names = (row[field] || '').split('\n').filter(n => n.trim());
+                  const isLowSaturday = field === 'low' && row.day === 'SÁBADO';
+                  const maxSlots = isLowSaturday ? 2 : 1;
+
+                  return (
+                    <td key={field}>
+                      {isEditing ? (
+                        <CellEdit>
+                          {field.startsWith('troca') ? (
+                            <>
+                              <AddBtn 
+                                type="swap" 
+                                onClick={() => openModal(row.id, field, row.day, 'TROCA')}
+                              >
+                                <FaArrowRightArrowLeft /> Add Troca
+                              </AddBtn>
+                              <div style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>
+                                {names.map((n, i) => <div key={i}>{n}</div>)}
+                              </div>
+                            </>
+                          ) : (
+                            [...Array(maxSlots)].map((_, i) => (
+                              <div key={i} style={{ marginBottom: '4px' }}>
+                                {names[i] ? (
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#f8f9fa', padding: '6px', borderRadius: '4px' }}>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 900 }}>{names[i]}</span>
+                                    <IconButton 
+                                      style={{ padding: '2px', fontSize: '0.8rem' }} 
+                                      onClick={() => openModal(row.id, field, row.day, field.toUpperCase(), i)}
+                                    >
+                                      <FaEdit />
+                                    </IconButton>
+                                  </div>
+                                ) : (
+                                  <AddBtn 
+                                    type="add" 
+                                    onClick={() => openModal(row.id, field, row.day, field.toUpperCase(), i)}
+                                  >
+                                    <FaPlusCircle /> Vaga {i + 1}
+                                  </AddBtn>
+                                )}
+                              </div>
+                            ))
+                          )}
+                        </CellEdit>
+                      ) : (
+                        <div style={{ whiteSpace: 'pre-wrap' }}>{row[field]}</div>
+                      )}
+                    </td>
+                  );
+                })}
+
 
                 {isEditing && (
                   <td className="no-print">
