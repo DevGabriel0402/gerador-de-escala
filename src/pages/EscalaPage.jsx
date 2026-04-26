@@ -128,13 +128,7 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
 
 
 
-  const handleAddRow = async () => {
-    const newId = Date.now();
-    const newRow = { id: newId, date: '', day: '', low: '', prime: '', trocaLow: '', trocaPrime: '', highlight: schedule.length % 2 === 0 };
-    await saveScheduleRow(newRow, schedule.length);
-    setIsEditing(true);
-    toast.success('Linha adicionada');
-  };
+
 
   const handleUpdate = async (id, field, value) => {
     const row = schedule.find(r => r.id === id);
@@ -302,11 +296,7 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
           <Button $variant={isEditing ? 'success' : 'blue'} onClick={() => setIsEditing(!isEditing)}>
             {isEditing ? <><FaSave /> Salvar Edição</> : <><FaEdit /> Editar Escala</>}
           </Button>
-          {isEditing && (
-            <Button $variant="dark" onClick={handleAddRow}>
-              <FaPlus /> Add Linha
-            </Button>
-          )}
+
           <Button $variant="dark" onClick={handleRandomGeneration}>
             <FaShuffle /> Sorteio Aleatório
           </Button>
