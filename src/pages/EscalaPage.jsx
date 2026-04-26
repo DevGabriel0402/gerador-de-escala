@@ -163,32 +163,33 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
     const loadingToast = toast.loading('Sorteando colaboradores...');
     
     try {
-      // Criar pool de nomes disponíveis
-      let pool = [...employees.map(e => e.name)];
-      const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+      // Criar pools separados
+      let poolLow = [...employees.filter(e => e.role === 'low').map(e => e.name)];
+      let poolPrime = [...employees.filter(e => e.role === 'prime').map(e => e.name)];
       
-      const getNext = (excluded = []) => {
-        // Filtrar pool para remover quem já está no dia atual
+      const shuffle = (array) => array.sort(() => Math.random() - 0.5);
+      shuffle(poolLow);
+      shuffle(poolPrime);
+
+      const getNext = (type, excluded = []) => {
+        let pool = type === 'low' ? poolLow : poolPrime;
         let available = pool.filter(p => !excluded.includes(p));
         
         if (available.length === 0) {
-          // Se não houver ninguém disponível que não esteja no dia,
-          // resetamos o pool mas ainda respeitamos o excluded se possível
-          pool = [...employees.map(e => e.name)];
-          shuffle(pool);
+          // Resetar pool se necessário
+          const original = employees.filter(e => e.role === type).map(e => e.name);
+          if (type === 'low') poolLow = shuffle([...original]);
+          else poolPrime = shuffle([...original]);
+          pool = type === 'low' ? poolLow : poolPrime;
           available = pool.filter(p => !excluded.includes(p));
-          
-          // Caso extremo: se mesmo resetando não houver ninguém (ex: 1 funcionário para 2 vagas)
           if (available.length === 0) available = pool;
         }
         
         const selected = available.pop();
-        // Remover o selecionado do pool original
-        pool = pool.filter(p => p !== selected);
+        if (type === 'low') poolLow = poolLow.filter(p => p !== selected);
+        else poolPrime = poolPrime.filter(p => p !== selected);
         return selected;
       };
-
-      shuffle(pool);
 
       for (let i = 0; i < schedule.length; i++) {
         const row = schedule[i];
@@ -196,19 +197,20 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
         const dayUsed = [];
         
         // Sábado Low (2 vagas) ou Domingo Low (1 vaga)
-        const low1 = getNext(dayUsed);
+        const low1 = getNext('low', dayUsed);
         dayUsed.push(low1);
         
         let lowValue = low1;
         if (isSaturday) {
-          const low2 = getNext(dayUsed);
+          const low2 = getNext('low', dayUsed);
           dayUsed.push(low2);
           lowValue = `${low1}\n${low2}`;
         }
 
         // Prime (1 vaga)
-        const primeValue = getNext(dayUsed);
+        const primeValue = getNext('prime', dayUsed);
         dayUsed.push(primeValue);
+
 
         await saveScheduleRow({
           ...row,

@@ -131,6 +131,7 @@ export const theme = {
     error: '#c0392b',
     blue: '#3498db',
     purple: '#9b59b6',
+    navy: '#1a2a3a',
     dark: '#1a1a1a'
   },
   shadows: {

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { FaXmark, FaArrowRightArrowLeft, FaUsers, FaDumbbell, FaDesktop, FaHeart } from 'react-icons/fa6';
+import { FaXmark, FaArrowRightArrowLeft, FaUsers, FaDumbbell, FaStar } from 'react-icons/fa6';
+
 
 const slideUp = keyframes`
   from { transform: translateY(100%); }
@@ -105,14 +106,14 @@ export const EmployeeSelectionModal = ({ modal, onClose, employees, onSelect }) 
         </Header>
 
         <Content>
-          {['professores', 'recepcao', 'bem_estar'].map(role => {
+          {['low', 'prime'].map(role => {
             const filtered = employees.filter(e => e.role === role);
             if (filtered.length === 0) return null;
             return (
               <Section key={role}>
                 <h4>
-                  {role === 'professores' ? <FaDumbbell /> : role === 'recepcao' ? <FaDesktop /> : <FaHeart />}
-                  {role.replace('_', ' ')}
+                  {role === 'low' ? <FaDumbbell /> : <FaStar />}
+                  {role.toUpperCase()}
                 </h4>
                 <Grid>
                   {filtered.map(emp => (
@@ -126,6 +127,7 @@ export const EmployeeSelectionModal = ({ modal, onClose, employees, onSelect }) 
           })}
           {employees.length === 0 && <p style={{ textAlign: 'center', color: '#999' }}>Nenhum funcionário cadastrado.</p>}
         </Content>
+
       </Modal>
     </Overlay>
   );

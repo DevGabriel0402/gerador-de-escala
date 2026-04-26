@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FaPlus, FaTrash, FaDumbbell, FaDesktop, FaHeart } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaDumbbell, FaStar } from 'react-icons/fa';
+
+
 import { Card, Button, IconButton } from '../styles/components';
 import { saveEmployee, deleteEmployee } from '../services/firestore';
 import toast from 'react-hot-toast';
@@ -40,31 +42,49 @@ const Select = styled.select`
 
 const TabsContainer = styled.div`
   display: flex;
-  border-bottom: 2px solid ${props => props.theme.colors.gray.medium};
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  margin-bottom: 2rem;
   overflow-x: auto;
+  padding-bottom: 0.5rem;
 `;
 
 const Tab = styled.button`
-  padding: 1rem 2rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
   font-weight: 900;
   font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  background: transparent;
-  color: ${props => props.$active ? props.theme.colors.primary : '#888'};
-  border-bottom: 4px solid ${props => props.$active ? props.theme.colors.primary : 'transparent'};
-  transition: all 0.3s;
   text-transform: uppercase;
+  transition: all 0.3s;
+  
+  background: ${props => {
+    if (!props.$active) return '#eee';
+    return props.$type === 'low' ? props.theme.colors.primary : props.theme.colors.navy;
+  }};
+  
+  color: ${props => props.$active ? 'white' : '#666'};
+  border: 2px solid ${props => {
+    if (!props.$active) return 'transparent';
+    return props.$type === 'low' ? props.theme.colors.primary : props.theme.colors.navy;
+  }};
 
   span {
-    background: ${props => props.$active ? props.theme.colors.primary : '#eee'};
+    background: rgba(255, 255, 255, 0.2);
     color: ${props => props.$active ? 'white' : '#666'};
     padding: 2px 10px;
     border-radius: 20px;
     font-size: 0.7rem;
     font-weight: 900;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    background: ${props => {
+      if (props.$active) return;
+      return '#e5e5e5';
+    }};
   }
 `;
 
@@ -98,8 +118,10 @@ const EmployeeCard = styled(Card)`
 
 export const EquipePage = ({ employees }) => {
   const [name, setName] = useState('');
-  const [role, setRole] = useState('professores');
-  const [activeTab, setActiveTab] = useState('professores');
+  const [role, setRole] = useState('low');
+  const [activeTab, setActiveTab] = useState('low');
+
+
 
   const handleAdd = async () => {
     if (!name.trim()) {
@@ -140,10 +162,10 @@ export const EquipePage = ({ employees }) => {
             onKeyDown={e => e.key === 'Enter' && handleAdd()}
           />
           <Select value={role} onChange={e => setRole(e.target.value)}>
-            <option value="professores">🏋️ PROFESSORES</option>
-            <option value="recepcao">🛎️ RECEPÇÃO</option>
-            <option value="bem_estar">🧘 BEM ESTAR</option>
+            <option value="low">🔴 MUSCULAÇÃO LOW</option>
+            <option value="prime">🔵 MUSCULAÇÃO PRIME</option>
           </Select>
+
           <Button $variant="primary" onClick={handleAdd}>
             + Adicionar
           </Button>
@@ -152,17 +174,13 @@ export const EquipePage = ({ employees }) => {
 
       <div>
         <TabsContainer>
-          <Tab $active={activeTab === 'professores'} onClick={() => setActiveTab('professores')}>
-            <FaDumbbell /> Professores <span>{employees.filter(e => e.role === 'professores').length}</span>
+          <Tab $active={activeTab === 'low'} $type="low" onClick={() => setActiveTab('low')}>
+            <FaDumbbell /> Musculação Low <span>{employees.filter(e => e.role === 'low').length}</span>
           </Tab>
-          <Tab $active={activeTab === 'recepcao'} onClick={() => setActiveTab('recepcao')}>
-            <FaDesktop /> Recepção <span>{employees.filter(e => e.role === 'recepcao').length}</span>
-          </Tab>
-          <Tab $active={activeTab === 'bem_estar'} onClick={() => setActiveTab('bem_estar')}>
-            <FaHeart /> Bem Estar <span>{employees.filter(e => e.role === 'bem_estar').length}</span>
+          <Tab $active={activeTab === 'prime'} $type="prime" onClick={() => setActiveTab('prime')}>
+            <FaStar /> Musculação Prime <span>{employees.filter(e => e.role === 'prime').length}</span>
           </Tab>
         </TabsContainer>
-
         <Grid>
           {filtered.length > 0 ? (
             filtered.map(emp => (
