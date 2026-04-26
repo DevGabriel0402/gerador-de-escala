@@ -31,13 +31,13 @@ const styles = StyleSheet.create({
   tableCol: { width: '20%', borderRightWidth: 1, borderColor: '#000', padding: 5, justifyContent: 'center', alignItems: 'center' },
   lastCol: { borderRightWidth: 0 },
 
-  headerText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center', color: '#ffffff' },
+  headerText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center', color: '#ffffff !important' },
 
 
-  cellText: { fontSize: 8, fontWeight: 'normal', textAlign: 'center' },
-  dayText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase' },
-  dateText: { fontSize: 8, fontWeight: 'bold' },
-  warningContainer: { marginTop: 20, padding: 10, border: 1, borderColor: '#000', borderRadius: 5, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  cellText: { fontSize: 8, fontWeight: 'normal', textAlign: 'center', color: '#000' },
+  dayText: { fontSize: 7, fontWeight: 'bold', textTransform: 'uppercase', color: '#000' },
+  dateText: { fontSize: 8, fontWeight: 'bold', color: '#000' },
+  warningContainer: { marginTop: 10, padding: 10, border: 1, borderColor: '#000', borderRadius: 5, flexDirection: 'row', alignItems: 'center', gap: 10 },
   warningText: { fontSize: 8, fontWeight: 'bold', textTransform: 'uppercase' }
 });
 
@@ -61,38 +61,38 @@ export const EscalaPDF = ({ schedule, unitName, warningMessage, monthName }) => 
       <View style={styles.table}>
         {/* HEADER */}
         <View style={[styles.tableRow, styles.tableHeader]}>
-          <View style={styles.tableColHeader}><Text style={styles.headerText, color: "#fff"}>DIA</Text></View>
-        <View style={styles.tableColHeader}><Text style={styles.headerText}>MUSCULAÇÃO{"\n"}(LOW)</Text></View>
-        <View style={styles.tableColHeader}><Text style={styles.headerText}>MUSCULAÇÃO{"\n"}PRIME</Text></View>
-        <View style={styles.tableColHeader}><Text style={styles.headerText}>TROCA LOW</Text></View>
-        <View style={[styles.tableColHeader, styles.lastCol]}><Text style={styles.headerText}>TROCA PRIME</Text></View>
-      </View>
-
-      {/* ROWS */}
-      {schedule.map((row) => (
-        <View key={row.id} style={row.highlight ? styles.tableRowHighlight : styles.tableRow}>
-          <View style={styles.tableCol}>
-            <Text style={styles.dateText}>{row.date}</Text>
-            <Text style={styles.dayText}>{row.day}</Text>
-          </View>
-          <View style={styles.tableCol}><Text style={styles.cellText}>{row.low}</Text></View>
-          <View style={styles.tableCol}><Text style={styles.cellText}>{row.prime}</Text></View>
-          <View style={styles.tableCol}><Text style={styles.cellText}>{row.trocaLow}</Text></View>
-          <View style={[styles.tableCol, styles.lastCol]}><Text style={styles.cellText}>{row.trocaPrime}</Text></View>
+          <View style={styles.tableColHeader}><Text style={styles.headerText}>DIA</Text></View>
+          <View style={styles.tableColHeader}><Text style={styles.headerText}>MUSCULAÇÃO{"\n"}(LOW)</Text></View>
+          <View style={styles.tableColHeader}><Text style={styles.headerText}>MUSCULAÇÃO{"\n"}PRIME</Text></View>
+          <View style={styles.tableColHeader}><Text style={styles.headerText}>TROCA LOW</Text></View>
+          <View style={[styles.tableColHeader, styles.lastCol]}><Text style={styles.headerText}>TROCA PRIME</Text></View>
         </View>
-      ))}
-    </View>
 
-    {warningMessage && (
-      <View style={styles.warningContainer}>
-        <Text style={styles.warningText}>{warningMessage}</Text>
+        {/* ROWS */}
+        {schedule.map((row) => (
+          <View key={row.id} style={row.highlight ? styles.tableRowHighlight : styles.tableRow}>
+            <View style={styles.tableCol}>
+              <Text style={styles.dateText}>{row.date}</Text>
+              <Text style={styles.dayText}>{row.day}</Text>
+            </View>
+            <View style={styles.tableCol}><Text style={styles.cellText}>{row.low}</Text></View>
+            <View style={styles.tableCol}><Text style={styles.cellText}>{row.prime}</Text></View>
+            <View style={styles.tableCol}><Text style={styles.cellText}>{row.trocaLow}</Text></View>
+            <View style={[styles.tableCol, styles.lastCol]}><Text style={styles.cellText}>{row.trocaPrime}</Text></View>
+          </View>
+        ))}
       </View>
-    )}
 
-    <Text style={{ marginTop: 20, textAlign: 'center', fontSize: 10, fontWeight: 'bold', color: '#e50914' }}>
-      BOM TRABALHO EQUIPE! 💪
-    </Text>
-  </Page>
-  </Document >
+      {warningMessage && (
+        <View>
+          <Text style={styles.warningText}>{warningMessage}</Text>
+        </View>
+      )}
+
+      <Text style={{ marginTop: 20, textAlign: 'center', fontSize: 10, fontWeight: 'bold', color: '#e50914' }}>
+        BOM TRABALHO EQUIPE! 💪
+      </Text>
+    </Page>
+  </Document>
 );
 

@@ -26,7 +26,6 @@ import {
 
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { EscalaPDF } from './utils/EscalaPDF';
-import logoApp from './assets/logo.png';
 import logoPratique from './assets/Menor-PRATIQUE.png';
 
 
@@ -220,18 +219,16 @@ export default function App() {
             <div id="capture-area" style={{
               background: '#f8f9fa',
               padding: '2rem',
-              borderRadius: '12px',
-              border: '1px solid #ddd',
               maxHeight: '500px',
               overflowY: 'auto',
-              marginBottom: '2rem'
+              marginBottom: '1rem'
             }}>
               <div id="print-area" style={{
                 background: 'white',
                 padding: '40px',
                 width: '100%',
                 minHeight: '600px',
-                boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+                boxShadow: '0 0 20px rgba(0,0,0,0.01)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'
@@ -249,7 +246,7 @@ export default function App() {
                   <img
                     src={logoPratique}
                     alt="Logo"
-                    style={{ height: '100px' }}
+                    style={{ height: '80px' }}
                   />
 
 
@@ -297,7 +294,7 @@ export default function App() {
                 </table>
 
                 {warningMessage && (
-                  <div style={{ marginTop: '30px', padding: '15px', border: '2px solid #000', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '15px', width: '100%' }}>
+                  <div style={{ marginTop: '30px', padding: '15px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '15px', width: '100%' }}>
                     <FaCircleInfo style={{ fontSize: '1.5rem', color: '#e50914' }} />
                     <span style={{ fontSize: '0.9rem', fontWeight: 900, textTransform: 'uppercase', color: '#000' }}>
                       {warningMessage}
@@ -309,6 +306,7 @@ export default function App() {
 
 
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+
               <Button
                 $variant="primary"
                 style={{ flex: 1, background: theme.colors.success }}

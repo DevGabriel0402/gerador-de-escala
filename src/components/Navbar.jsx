@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FaCalendarAlt, FaUsers, FaDice, FaCog } from 'react-icons/fa';
-import logoApp from '../assets/logo.png';
+import logoPratique from '../assets/Menor-PRATIQUE.png';
 
 
 const NavContainer = styled.div`
@@ -39,6 +39,7 @@ const LogoSection = styled.div`
     img {
       height: 54px;
       object-fit: contain;
+      filter: brightness(0) invert(1);
       @media (max-width: 900px) {
         height: 45px;
       }
@@ -155,7 +156,7 @@ export const Navbar = ({ activeTab, setActiveTab, unitName }) => {
       <TopHeader>
         <LogoSection>
           <div className="logo-box">
-            <img src={logoApp} alt="Pratique" />
+            <img src={logoPratique} alt="Pratique" />
 
           </div>
         </LogoSection>
