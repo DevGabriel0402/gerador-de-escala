@@ -456,21 +456,6 @@ export const EscalaPage = ({
         </Table>
       </TableContainer>
 
-      {warningMessage && (
-        <Card style={{ 
-          border: '2px solid #000', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '1rem',
-          background: '#fff1f1'
-        }}>
-          <FaCircleInfo style={{ fontSize: '1.5rem', color: '#e50914' }} />
-          <p style={{ margin: 0, fontWeight: 900, fontSize: '0.9rem', color: '#000', textTransform: 'uppercase' }}>
-            {warningMessage}
-          </p>
-        </Card>
-      )}
-
       <EmployeeSelectionModal 
         modal={modal} 
         onClose={() => setModal({ ...modal, isOpen: false })}
