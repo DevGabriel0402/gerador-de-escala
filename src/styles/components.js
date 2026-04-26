@@ -57,6 +57,11 @@ export const Button = styled.button`
     &:hover { background: ${props.theme.colors.gray.light}; transform: translateY(-1px); }
   `}
 
+  ${props => props.$variant === 'danger' && css`
+    background: ${props.theme.colors.error || '#e50914'};
+    &:hover { filter: brightness(1.1); transform: translateY(-2px); }
+  `}
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
