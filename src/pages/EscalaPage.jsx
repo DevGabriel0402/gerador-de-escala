@@ -122,7 +122,8 @@ const AddBtn = styled.button`
 
 export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPreviewModalOpen }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [modal, setModal] = useState({ isOpen: false, rowId: null, field: null, dayName: '', fieldName: '', swapStep: 1, firstEmployee: null });
+  const [modal, setModal] = useState({ isOpen: false, rowId: null, field: null, dayName: '', fieldName: '', swapStep: 1, firstEmployee: null, targetRole: null });
+
 
   const handleAddRow = async () => {
     const newId = Date.now();
@@ -249,8 +250,10 @@ export const EscalaPage = ({ schedule, employees, setIsMonthModalOpen, setIsPrev
   };
 
   const openModal = (rowId, field, dayName, fieldName) => {
-    setModal({ isOpen: true, rowId, field, dayName, fieldName, swapStep: 1, firstEmployee: null });
+    const targetRole = field.toLowerCase().includes('prime') ? 'prime' : 'low';
+    setModal({ isOpen: true, rowId, field, dayName, fieldName, swapStep: 1, firstEmployee: null, targetRole });
   };
+
 
   const onSelectEmployee = async (name) => {
     const row = schedule.find(r => r.id === modal.rowId);

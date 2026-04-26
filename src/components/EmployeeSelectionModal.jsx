@@ -106,9 +106,16 @@ export const EmployeeSelectionModal = ({ modal, onClose, employees, onSelect }) 
         </Header>
 
         <Content>
-          {['low', 'prime'].map(role => {
+          {(() => {
+            const role = modal.targetRole || 'low';
             const filtered = employees.filter(e => e.role === role);
-            if (filtered.length === 0) return null;
+            if (filtered.length === 0) {
+              return (
+                <p style={{ textAlign: 'center', color: '#999', padding: '2rem' }}>
+                  Nenhum funcionário cadastrado como {role.toUpperCase()}.
+                </p>
+              );
+            }
             return (
               <Section key={role}>
                 <h4>
@@ -124,9 +131,9 @@ export const EmployeeSelectionModal = ({ modal, onClose, employees, onSelect }) 
                 </Grid>
               </Section>
             );
-          })}
-          {employees.length === 0 && <p style={{ textAlign: 'center', color: '#999' }}>Nenhum funcionário cadastrado.</p>}
+          })()}
         </Content>
+
 
       </Modal>
     </Overlay>
