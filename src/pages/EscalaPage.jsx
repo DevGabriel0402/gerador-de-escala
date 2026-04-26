@@ -40,14 +40,15 @@ const Table = styled.table`
   text-align: center;
   
   th {
-    background: #fff;
+    background: ${props => props.theme.colors.primary};
     padding: 1.2rem 0.5rem;
     border: 2px solid #000;
     font-weight: 900;
     font-size: 0.85rem;
     text-transform: uppercase;
-    color: #000;
+    color: white;
   }
+
 
   td {
     padding: 0.8rem 0.4rem;

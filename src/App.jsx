@@ -232,11 +232,12 @@ export default function App() {
                 }}>
                   <thead>
                     <tr>
-                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center' }}>DIA</th>
-                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center' }}>MUSCULAÇÃO (LOW)</th>
-                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center' }}>MUSCULAÇÃO PRIME</th>
-                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center' }}>TROCA LOW</th>
-                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center' }}>TROCA PRIME</th>
+                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center', background: theme.colors.primary, color: 'white' }}>DIA</th>
+                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center', background: theme.colors.primary, color: 'white' }}>MUSCULAÇÃO (LOW)</th>
+                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center', background: theme.colors.primary, color: 'white' }}>MUSCULAÇÃO PRIME</th>
+                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center', background: theme.colors.primary, color: 'white' }}>TROCA LOW</th>
+                      <th style={{ border: '1px solid #000', padding: '10px', fontWeight: 900, textAlign: 'center', background: theme.colors.primary, color: 'white' }}>TROCA PRIME</th>
+
                     </tr>
                   </thead>
                   <tbody>
@@ -346,11 +347,12 @@ export default function App() {
           <table style={{ width: '100%', borderCollapse: 'collapse', border: '3px solid #000' }}>
             <thead>
               <tr style={{ background: '#fff' }}>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px' }}>DIA</th>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px' }}>MUSCULAÇÃO<br />(LOW)</th>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px' }}>MUSCULAÇÃO<br />PRIME</th>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px' }}>TROCA<br />LOW</th>
-                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px' }}>TROCA<br />PRIME</th>
+                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>DIA</th>
+                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>MUSCULAÇÃO<br />(LOW)</th>
+                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>MUSCULAÇÃO<br />PRIME</th>
+                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>TROCA<br />LOW</th>
+                <th style={{ border: '3px solid #000', padding: '25px 10px', fontWeight: '900', fontSize: '24px', background: '#e50914', color: 'white' }}>TROCA<br />PRIME</th>
+
               </tr>
             </thead>
             <tbody>
