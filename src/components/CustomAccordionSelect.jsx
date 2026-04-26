@@ -6,6 +6,7 @@ const AccordionContainer = styled.div`
   position: relative;
   width: 100%;
   min-width: 250px;
+  max-width: 350px;
 `;
 
 const AccordionHeader = styled.div`
@@ -87,8 +88,8 @@ export const CustomAccordionSelect = ({ options, value, onChange, placeholder })
       </AccordionHeader>
       <AccordionContent $isOpen={isOpen}>
         {options.map((option) => (
-          <OptionItem 
-            key={option.value} 
+          <OptionItem
+            key={option.value}
             $isSelected={option.value === value}
             onClick={() => handleSelect(option.value)}
           >

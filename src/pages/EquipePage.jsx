@@ -161,9 +161,10 @@ export const EquipePage = ({ employees }) => {
             value={role} 
             onChange={e => setRole(e.target.value)}
             options={[
-              { value: 'low', label: '🔴 MUSCULAÇÃO LOW' },
-              { value: 'prime', label: '🔵 MUSCULAÇÃO PRIME' }
+              { value: 'low', label: '🔴 LOW' },
+              { value: 'prime', label: '🔵 PRIME' }
             ]}
+
           />
 
 
@@ -176,10 +177,10 @@ export const EquipePage = ({ employees }) => {
       <div>
         <TabsContainer>
           <Tab $active={activeTab === 'low'} $type="low" onClick={() => setActiveTab('low')}>
-            <FaDumbbell /> Musculação Low <span>{employees.filter(e => e.role === 'low').length}</span>
+            <FaDumbbell /> Low <span>{employees.filter(e => e.role === 'low').length}</span>
           </Tab>
           <Tab $active={activeTab === 'prime'} $type="prime" onClick={() => setActiveTab('prime')}>
-            <FaStar /> Musculação Prime <span>{employees.filter(e => e.role === 'prime').length}</span>
+            <FaStar /> Prime <span>{employees.filter(e => e.role === 'prime').length}</span>
           </Tab>
         </TabsContainer>
         <Grid>
