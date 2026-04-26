@@ -90,7 +90,7 @@ export const EscalaPDF = ({ schedule, unitName, warningMessage, monthName }) => 
       )}
 
       <Text style={{ marginTop: 20, textAlign: 'center', fontSize: 10, fontWeight: 'bold', color: '#e50914' }}>
-        BOM TRABALHO EQUIPE! 💪
+        BOM TRABALHO EQUIPE! 💪🏿
       </Text>
     </Page>
   </Document>

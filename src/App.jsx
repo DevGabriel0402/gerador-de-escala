@@ -180,11 +180,11 @@ export default function App() {
           <ModalContent onClick={e => e.stopPropagation()}>
             <h3>Gerar Escala Anual</h3>
             <p>Escolha o ano. Isso criará escalas para <span style={{ color: 'red', fontWeight: 900 }}>todos os meses</span>. As escalas existentes serão apagadas.</p>
-            <input 
-              type="number" 
-              value={selectedYear} 
-              onChange={e => setSelectedYear(e.target.value)} 
-              min="2024" 
+            <input
+              type="number"
+              value={selectedYear}
+              onChange={e => setSelectedYear(e.target.value)}
+              min="2024"
               max="2100"
               style={{ textAlign: 'center' }}
             />
@@ -200,15 +200,15 @@ export default function App() {
                     setGlobalModal(prev => ({ ...prev, isOpen: false }));
                     setIsLoading(true);
                     const loadingToast = toast.loading(`Gerando escala para ${selectedYear}...`);
-                    
+
                     try {
                       await deleteAllSchedules();
-                      
+
                       let totalRows = 0;
                       for (let month = 1; month <= 12; month++) {
                         const monthId = `${selectedYear}-${String(month).padStart(2, '0')}`;
                         const daysInMonth = new Date(selectedYear, month, 0).getDate();
-                        
+
                         for (let day = 1; day <= daysInMonth; day++) {
                           const date = new Date(selectedYear, month - 1, day);
                           if (date.getDay() === 0 || date.getDay() === 6) {
@@ -222,7 +222,7 @@ export default function App() {
                           }
                         }
                       }
-                      
+
                       toast.success(`Escala anual de ${selectedYear} gerada!`, { id: loadingToast });
                       setIsMonthModalOpen(false);
                       setIsLoading(false);
@@ -333,6 +333,10 @@ export default function App() {
                     </span>
                   </div>
                 )}
+
+                <div style={{ marginTop: '20px', textAlign: 'center', width: '100%' }}>
+                  <p style={{ fontWeight: 900, color: '#e50914', fontSize: '1.1rem', margin: 0 }}>BOM TRABALHO EQUIPE! 💪🏿</p>
+                </div>
               </div>
             </div>
 
@@ -363,7 +367,7 @@ export default function App() {
                       allowTaint: true,
                       scale: 2
                     });
-                    
+
                     element.style.visibility = 'hidden';
                     const link = document.createElement('a');
                     link.download = `Escala-${unitName}-A4.png`;
@@ -439,6 +443,10 @@ export default function App() {
             <span style={{ fontSize: '18px', fontWeight: 900, textTransform: 'uppercase' }}>{warningMessage}</span>
           </div>
         )}
+
+        <div style={{ marginTop: '20px', textAlign: 'center', width: '100%' }}>
+          <p style={{ fontWeight: 900, color: '#e50914', fontSize: '24px', letterSpacing: '1px' }}>BOM TRABALHO EQUIPE! 💪🏿</p>
+        </div>
 
         <div style={{ marginTop: 'auto', textAlign: 'center', width: '100%', borderTop: '2px solid #eee', paddingTop: '20px' }}>
           <p style={{ fontWeight: 900, color: '#e50914', fontSize: '20px', letterSpacing: '2px' }}>PRATIQUE FITNESS - A MAIOR REDE DE MINAS</p>
