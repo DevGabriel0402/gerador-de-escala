@@ -172,6 +172,7 @@ const YearInput = styled.div`
 export const ConfigPage = ({
   unitName, setUnitName,
   warningMessage, setWarningMessage,
+  showPhotos, setShowPhotos,
   schedule,
   setGlobalModal,
   selectedYear, setSelectedYear,
@@ -184,7 +185,7 @@ export const ConfigPage = ({
   const handleSave = async () => {
     setSaving(true);
     try {
-      await updateSettings({ unitName, warningMessage });
+      await updateSettings({ unitName, warningMessage, showPhotos });
       toast.success('Configurações salvas!');
     } catch {
       toast.error('Erro ao salvar');
@@ -250,6 +251,15 @@ export const ConfigPage = ({
             placeholder="Ex: Chegar com 20 minutos de antecedência..."
           />
         </Field>
+
+        <ToggleRow onClick={() => setShowPhotos(!showPhotos)}>
+          <div className="info">
+            <strong>Mostrar fotos na escala</strong>
+            <p>Exibir fotos dos colaboradores na aba Escalados e no link público.</p>
+          </div>
+          <Toggle $on={showPhotos} />
+        </ToggleRow>
+
         <SaveRow>
           <Button $variant="primary" onClick={handleSave} disabled={saving}>
             <FaSave /> {saving ? 'Salvando...' : 'Salvar'}

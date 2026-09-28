@@ -102,6 +102,7 @@ export default function App() {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   const [warningMessage, setWarningMessage] = useState('Chegar com 20 minutos de antecedência para preparar o ambiente da academia.');
+  const [showPhotos, setShowPhotos] = useState(true);
   const now = new Date();
   const initialMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const [currentMonthId, setCurrentMonthId] = useState(initialMonth);
@@ -117,6 +118,7 @@ export default function App() {
       setUnitName(data.unitName || 'MANGABEIRAS');
       setDraftedEmployees(data.draftedEmployees || []);
       setWarningMessage(data.warningMessage || 'Chegar com 20 minutos de antecedência para preparar o ambiente da academia.');
+      setShowPhotos(data.showPhotos !== false);
       setIsLoading(false);
     });
 
@@ -144,7 +146,7 @@ export default function App() {
             <img src={logoPratique} alt="Pratique" style={{ height: '40px' }} />
             <div style={{ fontWeight: 900, color: '#e50914', letterSpacing: '1px' }}>{unitName}</div>
           </div>
-          <EscaladoPage schedule={schedule} employees={employees} isPublic={true} />
+          <EscaladoPage schedule={schedule} employees={employees} isPublic={true} showPhotos={showPhotos} />
         </div>
       </ThemeProvider>
     );
@@ -174,7 +176,7 @@ export default function App() {
           )}
 
           {activeTab === 'escalado' && (
-            <EscaladoPage schedule={schedule} monthName={computedMonthName} employees={employees} currentMonthId={currentMonthId} />
+            <EscaladoPage schedule={schedule} monthName={computedMonthName} employees={employees} currentMonthId={currentMonthId} showPhotos={showPhotos} />
           )}
 
           {activeTab === 'equipe' && (
@@ -191,6 +193,8 @@ export default function App() {
               setUnitName={setUnitName}
               warningMessage={warningMessage}
               setWarningMessage={setWarningMessage}
+              showPhotos={showPhotos}
+              setShowPhotos={setShowPhotos}
               schedule={schedule}
               setGlobalModal={setGlobalModal}
               selectedYear={selectedYear}

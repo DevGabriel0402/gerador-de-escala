@@ -205,7 +205,7 @@ function findEmployee(employees, name) {
 }
 
 // Renderiza um ou mais nomes, cada um com avatar
-function EmpCell({ nameStr, employees, type }) {
+function EmpCell({ nameStr, employees, type, showPhotos }) {
   if (!nameStr || !nameStr.trim()) {
     return <EmptySlot>—</EmptySlot>;
   }
@@ -215,6 +215,16 @@ function EmpCell({ nameStr, employees, type }) {
       {names.map((name, i) => {
         const emp = findEmployee(employees, name);
         const role = emp?.role || type;
+        
+        if (!showPhotos) {
+          return (
+            <EmpCard key={i} style={{ minWidth: 'auto', maxWidth: 'none', flexDirection: 'row', alignItems: 'center', padding: '10px 14px' }}>
+              <div style={{ width: 12, height: 12, borderRadius: '50%', background: role === 'prime' ? '#1a2a3a' : '#e50914', marginRight: '10px', flexShrink: 0 }}></div>
+              <EmpName style={{ padding: 0, textAlign: 'left', flex: 1 }}>{name}</EmpName>
+            </EmpCard>
+          );
+        }
+
         return (
           <EmpCard key={i}>
             <EmpAvatar $type={role}>
@@ -231,7 +241,7 @@ function EmpCell({ nameStr, employees, type }) {
   );
 }
 
-export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonthId, isPublic = false }) => {
+export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonthId, isPublic = false, showPhotos = true }) => {
   let displaySchedule = [];
 
   if (isPublic) {
@@ -319,7 +329,7 @@ export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonth
                   <SectionLabel $color="#e50914">
                     <FaDumbbell /> Musculação LOW
                   </SectionLabel>
-                  <EmpCell nameStr={row.low} employees={employees} type="low" />
+                  <EmpCell nameStr={row.low} employees={employees} type="low" showPhotos={showPhotos} />
                 </div>
 
                 <Divider />
@@ -329,7 +339,7 @@ export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonth
                   <SectionLabel $color="#1a2a3a">
                     <FaStar /> Musculação PRIME
                   </SectionLabel>
-                  <EmpCell nameStr={row.prime} employees={employees} type="prime" />
+                  <EmpCell nameStr={row.prime} employees={employees} type="prime" showPhotos={showPhotos} />
                 </div>
 
                 <Divider />
@@ -339,7 +349,7 @@ export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonth
                   <SectionLabel $color="#e59014">
                     <FaArrowRightArrowLeft /> Troca LOW
                   </SectionLabel>
-                  <EmpCell nameStr={row.trocaLow} employees={employees} type="low" />
+                  <EmpCell nameStr={row.trocaLow} employees={employees} type="low" showPhotos={showPhotos} />
                 </div>
 
                 <Divider />
@@ -349,7 +359,7 @@ export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonth
                   <SectionLabel $color="#7c3aed">
                     <FaArrowRightArrowLeft /> Troca PRIME
                   </SectionLabel>
-                  <EmpCell nameStr={row.trocaPrime} employees={employees} type="prime" />
+                  <EmpCell nameStr={row.trocaPrime} employees={employees} type="prime" showPhotos={showPhotos} />
                 </div>
               </DayBody>
             </DayCard>
