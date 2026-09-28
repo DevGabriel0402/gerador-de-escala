@@ -20,8 +20,7 @@ const SidebarWrap = styled.aside`
   box-shadow: 4px 0 24px rgba(229,9,20,0.18);
 
   @media (max-width: 900px) {
-    width: ${p => p.$open ? '100vw' : '0'};
-    border-radius: 0;
+    display: none;
   }
 `;
 

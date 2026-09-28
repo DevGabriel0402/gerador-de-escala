@@ -134,6 +134,23 @@ export default function App() {
     );
   }
 
+  const isPublicRoute = window.location.search.includes('public=true');
+
+  if (isPublicRoute) {
+    return (
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <div style={{ maxWidth: '600px', margin: '0 auto', padding: '1rem', paddingBottom: '3rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem', gap: '10px' }}>
+            <img src={logoPratique} alt="Pratique" style={{ height: '40px' }} />
+            <div style={{ fontWeight: 900, color: '#e50914', letterSpacing: '1px' }}>{unitName}</div>
+          </div>
+          <EscaladoPage schedule={schedule} monthName={computedMonthName} employees={employees} currentMonthId={currentMonthId} isPublic={true} />
+        </div>
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
@@ -158,7 +175,7 @@ export default function App() {
           )}
 
           {activeTab === 'escalado' && (
-            <EscaladoPage schedule={schedule} monthName={computedMonthName} employees={employees} />
+            <EscaladoPage schedule={schedule} monthName={computedMonthName} employees={employees} currentMonthId={currentMonthId} />
           )}
 
           {activeTab === 'equipe' && (

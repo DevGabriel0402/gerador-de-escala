@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaCalendarCheck, FaDumbbell, FaStar, FaArrowRightArrowLeft } from 'react-icons/fa6';
+import { FaCalendarCheck, FaDumbbell, FaStar, FaArrowRightArrowLeft, FaLink } from 'react-icons/fa6';
+import { toast } from 'react-hot-toast';
 import logoPratique from '../assets/Menor-PRATIQUE.png';
 
 const PageTitle = styled.div`
@@ -195,15 +196,68 @@ function EmpCell({ nameStr, employees, type }) {
   );
 }
 
-export const EscaladoPage = ({ schedule, monthName, employees = [] }) => {
-  const filled = schedule.filter(r => r.low || r.prime || r.trocaLow || r.trocaPrime);
+export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonthId, isPublic = false }) => {
+  let displaySchedule = [];
+
+  if (isPublic) {
+    // Modo Público: Encontra o fim de semana mais próximo
+    const [yearStr, monthStr] = (currentMonthId || '').split('-');
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const pairs = [];
+    for (let i = 0; i < schedule.length; i += 2) {
+      pairs.push(schedule.slice(i, i + 2));
+    }
+
+    let closestPair = pairs[0] || [];
+    if (yearStr && monthStr) {
+      for (const group of pairs) {
+        const lastRow = group[group.length - 1];
+        if (lastRow) {
+          const [dayStr] = lastRow.date.split('/');
+          const rowDate = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr));
+          if (rowDate >= today) {
+            closestPair = group;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!closestPair || closestPair.length === 0) {
+      closestPair = pairs[pairs.length - 1] || [];
+    }
+    displaySchedule = closestPair;
+  } else {
+    // Modo Admin: Mostra o mês todo
+    displaySchedule = schedule;
+  }
+
+  // Mantém os rows preenchidos
+  const filled = displaySchedule.filter(r => r.low || r.prime || r.trocaLow || r.trocaPrime);
 
   return (
     <div>
-      <PageTitle>
-        <h2>Escalado do Final de Semana</h2>
-        <p>Visualize quem está escalado por dia</p>
-      </PageTitle>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+        <PageTitle style={{ marginBottom: 0 }}>
+          <h2>{isPublic ? 'Escala do Final de Semana' : 'Escalado do Mês'}</h2>
+          <p>{isPublic ? 'Confira quem está escalado para este final de semana' : 'Visualize quem está escalado por dia'}</p>
+        </PageTitle>
+
+        {!isPublic && (
+          <button
+            onClick={() => {
+              const url = `${window.location.origin}${window.location.pathname}?public=true`;
+              navigator.clipboard.writeText(url);
+              toast.success('Link público copiado! 🎉');
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', background: '#e50914', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}
+          >
+            <FaLink /> Copiar Link Público
+          </button>
+        )}
+      </div>
 
       {monthName && (
         <MonthLabel>
