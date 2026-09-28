@@ -1,206 +1,341 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import { FaPlus, FaTrash, FaDumbbell, FaStar } from 'react-icons/fa';
-
-
+import { FaPlus, FaTrash, FaDumbbell, FaStar, FaCamera, FaUpload } from 'react-icons/fa';
+import logoPratique from '../assets/Menor-PRATIQUE.png';
 import { Card, Button, IconButton } from '../styles/components';
 import { saveEmployee, deleteEmployee } from '../services/firestore';
 import { CustomAccordionSelect } from '../components/CustomAccordionSelect';
 import toast from 'react-hot-toast';
 
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+const PageTitle = styled.div`
+  margin-bottom: 2rem;
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #1a1a1a;
+  }
+  p { color: #888; font-size: 0.9rem; margin-top: 4px; }
 `;
 
-const FormRow = styled(Card)`
+const AddCard = styled(Card)`
   display: flex;
   gap: 1rem;
-  background: ${props => props.theme.colors.gray.light};
+  align-items: flex-end;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #eee;
+  margin-bottom: 0.5rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 700px) {
     flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 140px;
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 `;
 
 const Input = styled.input`
-  flex: 1;
-  padding: 0.8rem 1rem;
-  border: 1px solid ${props => props.theme.colors.gray.medium};
-  border-radius: ${props => props.theme.radius.medium};
-  text-transform: uppercase;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 10px;
   font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  background: #fafafa;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #e50914;
+    background: #fff;
+  }
 `;
 
-
-
-const TabsContainer = styled.div`
+const TabsRow = styled.div`
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
 `;
 
 const Tab = styled.button`
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
+  padding: 0.65rem 1.4rem;
+  border-radius: 10px;
   font-weight: 900;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
   text-transform: uppercase;
-  transition: all 0.3s;
-  
-  background: ${props => {
-    if (!props.$active) return '#eee';
-    return props.$type === 'low' ? props.theme.colors.primary : props.theme.colors.navy;
+  border: 2px solid ${p => {
+    if (!p.$active) return '#eee';
+    return p.$type === 'low' ? '#e50914' : '#1a2a3a';
   }};
-  
-  color: ${props => props.$active ? 'white' : '#666'};
-  border: 2px solid ${props => {
-    if (!props.$active) return 'transparent';
-    return props.$type === 'low' ? props.theme.colors.primary : props.theme.colors.navy;
+  background: ${p => {
+    if (!p.$active) return '#f5f5f5';
+    return p.$type === 'low' ? '#e50914' : '#1a2a3a';
   }};
+  color: ${p => p.$active ? '#fff' : '#888'};
+  cursor: pointer;
+  transition: all 0.2s;
 
-  span {
-    background: rgba(255, 255, 255, 0.2);
-    color: ${props => props.$active ? 'white' : '#666'};
-    padding: 2px 10px;
+  .count {
+    background: rgba(255,255,255,0.22);
+    color: ${p => p.$active ? '#fff' : '#888'};
+    padding: 1px 8px;
     border-radius: 20px;
     font-size: 0.7rem;
-    font-weight: 900;
   }
 
-  &:hover {
-    transform: translateY(-2px);
-    background: ${props => {
-      if (props.$active) return;
-      return '#e5e5e5';
-    }};
-  }
+  &:hover { transform: translateY(-1px); }
 `;
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.2rem;
 `;
 
-const EmployeeCard = styled(Card)`
+const EmpCard = styled.div`
+  background: #fff;
+  border-radius: 16px;
+  border: 1.5px solid #f0f0f0;
+  padding: 1.2rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1.2rem 1.5rem;
-  border: 1px solid #eee;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-  border-radius: 8px;
+  gap: 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  transition: all 0.2s;
 
   &:hover {
-    border-color: ${props => props.theme.colors.primary};
+    border-color: #e50914;
+    box-shadow: 0 6px 20px rgba(229,9,20,0.10);
     transform: translateY(-2px);
   }
+`;
 
-  span {
+const Avatar = styled.div`
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid ${p => p.$type === 'prime' ? '#1a2a3a' : '#e50914'};
+  cursor: pointer;
+  position: relative;
+
+  img.photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  img.placeholder {
+    width: 68%;
+    height: 68%;
+    object-fit: contain;
+    filter: ${p => p.$type === 'prime'
+      ? 'brightness(0) saturate(100%) invert(11%) sepia(39%) saturate(1200%) hue-rotate(185deg) brightness(90%) contrast(95%)'
+      : 'brightness(0) saturate(100%) invert(14%) sepia(88%) saturate(4000%) hue-rotate(349deg) brightness(95%) contrast(100%)'
+    };
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    svg { font-size: 1rem; color: #fff; }
+  }
+
+  &:hover .overlay {
+    display: flex;
+  }
+`;
+
+const EmpInfo = styled.div`
+  flex: 1;
+  min-width: 0;
+
+  .name {
     font-weight: 900;
-    color: #1a1a1a;
     font-size: 0.95rem;
     text-transform: uppercase;
+    color: #1a1a1a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+
+  .role {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: ${p => p.$type === 'prime' ? '#1a2a3a' : '#e50914'};
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+`;
+
+const RoleBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: ${p => p.$type === 'prime' ? 'rgba(26,42,58,0.10)' : 'rgba(229,9,20,0.10)'};
+  color: ${p => p.$type === 'prime' ? '#1a2a3a' : '#e50914'};
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 900;
+`;
+
+const EmptyState = styled.div`
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #ccc;
+  svg { font-size: 3rem; margin-bottom: 1rem; }
+  p { font-weight: 700; font-size: 0.9rem; }
 `;
 
 export const EquipePage = ({ employees }) => {
   const [name, setName] = useState('');
   const [role, setRole] = useState('low');
   const [activeTab, setActiveTab] = useState('low');
-
-
+  const fileRefs = useRef({});
 
   const handleAdd = async () => {
-    if (!name.trim()) {
-      toast.error('Informe o nome do funcionário');
-      return;
-    }
+    if (!name.trim()) { toast.error('Informe o nome do profissional'); return; }
     try {
-      await saveEmployee({ name: name.toUpperCase(), role });
+      await saveEmployee({ name: name.toUpperCase(), role, photo: '' });
       setName('');
-      toast.success('Funcionário cadastrado com sucesso!');
-    } catch (err) {
+      toast.success('Profissional cadastrado!');
+    } catch {
       toast.error('Erro ao cadastrar');
     }
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Deseja excluir este funcionário?')) {
-      try {
-        await deleteEmployee(id);
-        toast.success('Removido com sucesso');
-      } catch (err) {
-        toast.error('Erro ao remover');
-      }
+    if (confirm('Deseja excluir este profissional?')) {
+      try { await deleteEmployee(id); toast.success('Removido!'); }
+      catch { toast.error('Erro ao remover'); }
     }
+  };
+
+  const handlePhoto = async (emp, file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        await saveEmployee({ ...emp, photo: e.target.result });
+        toast.success('Foto atualizada!');
+      } catch { toast.error('Erro ao salvar foto'); }
+    };
+    reader.readAsDataURL(file);
   };
 
   const filtered = employees.filter(e => e.role === activeTab);
 
   return (
-    <Container>
-      <div>
-        <h2 style={{ marginBottom: '1.5rem', fontWeight: 900 }}>Gerenciar Equipe</h2>
+    <div>
+      <PageTitle>
+        <h2>Profissionais</h2>
+        <p>Gerencie a equipe por setor (LOW / PRIME)</p>
+      </PageTitle>
 
-        <FormRow>
-          <Input 
-            placeholder="NOME COMPLETO" 
-            value={name} 
+      <AddCard>
+        <InputGroup>
+          <label>Nome completo</label>
+          <Input
+            placeholder="EX: JOÃO SILVA"
+            value={name}
             onChange={e => setName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAdd()}
           />
-          <CustomAccordionSelect 
-            value={role} 
+        </InputGroup>
+        <InputGroup style={{ flex: '0 0 160px', minWidth: '140px' }}>
+          <label>Setor</label>
+          <CustomAccordionSelect
+            value={role}
             onChange={e => setRole(e.target.value)}
             options={[
               { value: 'low', label: '🔴 LOW' },
-              { value: 'prime', label: '🔵 PRIME' }
+              { value: 'prime', label: '🔵 PRIME' },
             ]}
-
           />
+        </InputGroup>
+        <Button $variant="primary" onClick={handleAdd} style={{ height: '44px', alignSelf: 'flex-end', flexShrink: 0, whiteSpace: 'nowrap' }}>
+          <FaPlus /> Adicionar
+        </Button>
+      </AddCard>
 
-
-          <Button $variant="primary" onClick={handleAdd}>
-            + Adicionar
-          </Button>
-        </FormRow>
-      </div>
-
-      <div>
-        <TabsContainer>
+      <div style={{ marginTop: '2rem' }}>
+        <TabsRow>
           <Tab $active={activeTab === 'low'} $type="low" onClick={() => setActiveTab('low')}>
-            <FaDumbbell /> Low <span>{employees.filter(e => e.role === 'low').length}</span>
+            <FaDumbbell /> LOW <span className="count">{employees.filter(e => e.role === 'low').length}</span>
           </Tab>
           <Tab $active={activeTab === 'prime'} $type="prime" onClick={() => setActiveTab('prime')}>
-            <FaStar /> Prime <span>{employees.filter(e => e.role === 'prime').length}</span>
+            <FaStar /> PRIME <span className="count">{employees.filter(e => e.role === 'prime').length}</span>
           </Tab>
-        </TabsContainer>
+        </TabsRow>
+
         <Grid>
-          {filtered.length > 0 ? (
-            filtered.map(emp => (
-              <EmployeeCard key={emp.id}>
-                <span>{emp.name}</span>
-                <IconButton onClick={() => handleDelete(emp.id)} $hoverColor="#e50914">
-                  <FaTrash />
-                </IconButton>
-              </EmployeeCard>
-            ))
-          ) : (
-            <p style={{ color: '#999', padding: '2rem', textAlign: 'center', gridColumn: '1 / -1' }}>
-              Nenhum funcionário cadastrado neste setor.
-            </p>
+          {filtered.length > 0 ? filtered.map(emp => (
+            <EmpCard key={emp.id}>
+              {/* Hidden file input */}
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                ref={el => fileRefs.current[emp.id] = el}
+                onChange={e => handlePhoto(emp, e.target.files[0])}
+              />
+              <Avatar $type={emp.role} onClick={() => fileRefs.current[emp.id]?.click()} title="Clique para trocar foto">
+                {emp.photo
+                  ? <img className="photo" src={emp.photo} alt={emp.name} />
+                  : <img className="placeholder" src={logoPratique} alt="Pratique" />
+                }
+                <div className="overlay"><FaCamera /></div>
+              </Avatar>
+
+              <EmpInfo $type={emp.role}>
+                <div className="name">{emp.name}</div>
+                <RoleBadge $type={emp.role}>
+                  {emp.role === 'low' ? <><FaDumbbell /> LOW</> : <><FaStar /> PRIME</>}
+                </RoleBadge>
+              </EmpInfo>
+
+              <IconButton onClick={() => handleDelete(emp.id)} $hoverColor="#e50914" title="Excluir">
+                <FaTrash />
+              </IconButton>
+            </EmpCard>
+          )) : (
+            <EmptyState>
+              <FaUsers />
+              <p>Nenhum profissional cadastrado neste setor.</p>
+            </EmptyState>
           )}
         </Grid>
       </div>
-    </Container>
+    </div>
   );
 };

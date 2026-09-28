@@ -5,8 +5,6 @@ import { FaChevronDown } from 'react-icons/fa';
 const AccordionContainer = styled.div`
   position: relative;
   width: 100%;
-  min-width: 250px;
-  max-width: 350px;
 `;
 
 const AccordionHeader = styled.div`
