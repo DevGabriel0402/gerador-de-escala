@@ -26,82 +26,116 @@ const MonthLabel = styled.div`
 `;
 
 const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 1.4rem;
+
+  > * {
+    flex: 1;
+    min-width: 320px;
+  }
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    
+    > * {
+      min-width: 100%;
+    }
+  }
 `;
 
 const DayCard = styled.div`
-  background: #fff;
-  border-radius: 16px;
-  border: 1.5px solid ${p => p.$highlight ? '#e50914' : '#f0f0f0'};
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.03);
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  transition: all 0.2s;
-
-  &:hover {
-    box-shadow: 0 8px 28px rgba(229,9,20,0.12);
-    transform: translateY(-2px);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 6px;
+    background: ${p => p.$highlight ? 'linear-gradient(90deg, #e50914, #ff4b4b)' : 'linear-gradient(90deg, #1a2a3a, #3a4a5a)'};
   }
 `;
 
 const DayHeader = styled.div`
-  background: ${p => p.$highlight ? '#e50914' : '#1a2a3a'};
-  color: #fff;
-  padding: 0.8rem 1.2rem;
+  background: transparent;
+  color: #111;
+  padding: 1.5rem 1.5rem 0.5rem;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
 
-  .date { font-size: 1.15rem; font-weight: 900; }
+  .date { 
+    font-size: 2.2rem; 
+    font-weight: 900; 
+    letter-spacing: -1.5px;
+    line-height: 1;
+    color: ${p => p.$highlight ? '#e50914' : '#111'};
+  }
   .dayname {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    opacity: 0.8;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #a0a0a0;
     text-transform: uppercase;
-    margin-top: 2px;
+    margin-bottom: 4px;
+  }
+  
+  svg {
+    font-size: 1.8rem;
+    color: #f0f0f0;
   }
 `;
 
 const DayBody = styled.div`
-  padding: 1rem 1.2rem;
+  padding: 1rem 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 1.5rem;
 `;
 
 const SectionLabel = styled.div`
-  font-size: 0.62rem;
+  font-size: 0.7rem;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   color: ${p => p.$color || '#888'};
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin-bottom: 4px;
+  gap: 8px;
+  margin-bottom: 12px;
+  
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(0,0,0,0.06);
+  }
 `;
 
-const EmpRow = styled.div`
+const EmpCard = styled.div`
+  flex: 1;
+  min-width: 100px;
+  max-width: 150px;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 8px;
-  background: #fafafa;
-  border-radius: 8px;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 16px;
   border: 1px solid #f0f0f0;
-  min-height: 38px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  overflow: hidden;
 `;
 
 const EmpAvatar = styled.div`
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: #fff;
-  border: 2px solid ${p => p.$type === 'prime' ? '#1a2a3a' : '#e50914'};
-  overflow: hidden;
+  width: 100%;
+  height: 120px;
+  background: #fdfdfd;
+  border-bottom: 4px solid ${p => p.$type === 'prime' ? '#1a2a3a' : '#e50914'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,6 +144,7 @@ const EmpAvatar = styled.div`
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: top;
   }
 
   img.placeholder {
@@ -123,23 +158,25 @@ const EmpAvatar = styled.div`
   }
 `;
 
-const EmpName = styled.span`
+const EmpName = styled.div`
+  padding: 10px 6px;
+  text-align: center;
   font-size: 0.8rem;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-weight: 900;
+  color: #111;
   text-transform: uppercase;
   white-space: pre-wrap;
-  line-height: 1.3;
+  line-height: 1.2;
 `;
 
 const EmptySlot = styled.div`
   display: flex;
   align-items: center;
-  padding: 5px 8px;
+  padding: 8px 12px;
   background: #fafafa;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px dashed #e5e5e5;
-  min-height: 38px;
+  min-height: 48px;
   color: #ccc;
   font-size: 0.78rem;
   font-style: italic;
@@ -155,9 +192,7 @@ const EmptyState = styled.div`
 `;
 
 const Divider = styled.div`
-  height: 1px;
-  background: #f0f0f0;
-  margin: 2px 0;
+  display: none;
 `;
 
 // Busca o funcionário pelo nome (case-insensitive) e retorna foto + role
@@ -176,12 +211,12 @@ function EmpCell({ nameStr, employees, type }) {
   }
   const names = nameStr.split('\n').map(n => n.trim()).filter(Boolean);
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
       {names.map((name, i) => {
         const emp = findEmployee(employees, name);
         const role = emp?.role || type;
         return (
-          <EmpRow key={i}>
+          <EmpCard key={i}>
             <EmpAvatar $type={role}>
               {emp?.photo
                 ? <img className="photo" src={emp.photo} alt={name} />
@@ -189,7 +224,7 @@ function EmpCell({ nameStr, employees, type }) {
               }
             </EmpAvatar>
             <EmpName>{name}</EmpName>
-          </EmpRow>
+          </EmpCard>
         );
       })}
     </div>
@@ -200,35 +235,30 @@ export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonth
   let displaySchedule = [];
 
   if (isPublic) {
-    // Modo Público: Encontra o fim de semana mais próximo
-    const [yearStr, monthStr] = (currentMonthId || '').split('-');
+    // Modo Público: Mostra os dias escalados pros próximos 7 dias
     const today = new Date();
     today.setHours(0,0,0,0);
 
-    const pairs = [];
-    for (let i = 0; i < schedule.length; i += 2) {
-      pairs.push(schedule.slice(i, i + 2));
-    }
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
 
-    let closestPair = pairs[0] || [];
-    if (yearStr && monthStr) {
-      for (const group of pairs) {
-        const lastRow = group[group.length - 1];
-        if (lastRow) {
-          const [dayStr] = lastRow.date.split('/');
-          const rowDate = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr));
-          if (rowDate >= today) {
-            closestPair = group;
-            break;
-          }
-        }
-      }
-    }
+    displaySchedule = schedule.filter(row => {
+      if (!row.monthId) return false;
+      const [yearStr, monthStr] = row.monthId.split('-');
+      const [dayStr] = row.date.split('/');
+      const rowDate = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr));
+      
+      // Inclui se a data for de hoje até 7 dias pra frente
+      return rowDate >= today && rowDate <= nextWeek;
+    });
 
-    if (!closestPair || closestPair.length === 0) {
-      closestPair = pairs[pairs.length - 1] || [];
-    }
-    displaySchedule = closestPair;
+    // Ordenar a exibição apenas para garantir que dias de meses diferentes fiquem na ordem correta cronologicamente
+    displaySchedule.sort((a, b) => {
+      const dateA = new Date(Number(a.monthId.split('-')[0]), Number(a.monthId.split('-')[1]) - 1, Number(a.date.split('/')[0]));
+      const dateB = new Date(Number(b.monthId.split('-')[0]), Number(b.monthId.split('-')[1]) - 1, Number(b.date.split('/')[0]));
+      return dateA - dateB;
+    });
+
   } else {
     // Modo Admin: Mostra o mês todo
     displaySchedule = schedule;
@@ -241,8 +271,8 @@ export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonth
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
         <PageTitle style={{ marginBottom: 0 }}>
-          <h2>{isPublic ? 'Escala do Final de Semana' : 'Escalado do Mês'}</h2>
-          <p>{isPublic ? 'Confira quem está escalado para este final de semana' : 'Visualize quem está escalado por dia'}</p>
+          <h2>{isPublic ? 'Escala dos Próximos 7 Dias' : 'Escalado do Mês'}</h2>
+          <p>{isPublic ? 'Confira quem está escalado para os próximos dias' : 'Visualize quem está escalado por dia'}</p>
         </PageTitle>
 
         {!isPublic && (
@@ -259,7 +289,7 @@ export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonth
         )}
       </div>
 
-      {monthName && (
+      {monthName && !isPublic && (
         <MonthLabel>
           <FaCalendarCheck /> {monthName}
         </MonthLabel>

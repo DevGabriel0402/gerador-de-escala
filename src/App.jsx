@@ -108,10 +108,11 @@ export default function App() {
   const [globalModal, setGlobalModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {}, type: 'info', isAlert: false });
 
   const computedMonthName = new Date(currentMonthId + '-02').toLocaleString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase();
+  const isPublicRoute = window.location.search.includes('public=true');
 
   useEffect(() => {
     const unsubEmployees = subscribeEmployees(setEmployees);
-    const unsubSchedule = subscribeSchedule(currentMonthId, setSchedule);
+    const unsubSchedule = subscribeSchedule(isPublicRoute ? null : currentMonthId, setSchedule);
     const unsubSettings = subscribeSettings((data) => {
       setUnitName(data.unitName || 'MANGABEIRAS');
       setDraftedEmployees(data.draftedEmployees || []);
@@ -120,7 +121,7 @@ export default function App() {
     });
 
     return () => { unsubEmployees(); unsubSchedule(); unsubSettings(); };
-  }, [currentMonthId]);
+  }, [currentMonthId, isPublicRoute]);
 
   if (isLoading) {
     return (
@@ -134,8 +135,6 @@ export default function App() {
     );
   }
 
-  const isPublicRoute = window.location.search.includes('public=true');
-
   if (isPublicRoute) {
     return (
       <ThemeProvider theme={theme}>
@@ -145,7 +144,7 @@ export default function App() {
             <img src={logoPratique} alt="Pratique" style={{ height: '40px' }} />
             <div style={{ fontWeight: 900, color: '#e50914', letterSpacing: '1px' }}>{unitName}</div>
           </div>
-          <EscaladoPage schedule={schedule} monthName={computedMonthName} employees={employees} currentMonthId={currentMonthId} isPublic={true} />
+          <EscaladoPage schedule={schedule} employees={employees} isPublic={true} />
         </div>
       </ThemeProvider>
     );
