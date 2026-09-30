@@ -1,8 +1,35 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaCalendarCheck, FaDumbbell, FaStar, FaArrowRightArrowLeft, FaLink } from 'react-icons/fa6';
+import { FaCalendarCheck, FaDumbbell, FaStar, FaArrowRightArrowLeft, FaLink, FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
 import { toast } from 'react-hot-toast';
 import logoPratique from '../assets/Menor-PRATIQUE.png';
+
+const MonthNavigator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #eee;
+    color: #e50914;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    
+    &:hover {
+      background: #e50914;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+  }
+`;
 
 const PageTitle = styled.div`
   margin-bottom: 1.5rem;
@@ -241,8 +268,22 @@ function EmpCell({ nameStr, employees, type, showPhotos }) {
   );
 }
 
-export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonthId, isPublic = false, showPhotos = true }) => {
+export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonthId, setCurrentMonthId, isPublic = false, showPhotos = true }) => {
   let displaySchedule = [];
+
+  const handlePrevMonth = () => {
+    if (!currentMonthId || !setCurrentMonthId) return;
+    const [year, month] = currentMonthId.split('-').map(Number);
+    const date = new Date(year, month - 2, 1);
+    setCurrentMonthId(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
+  };
+
+  const handleNextMonth = () => {
+    if (!currentMonthId || !setCurrentMonthId) return;
+    const [year, month] = currentMonthId.split('-').map(Number);
+    const date = new Date(year, month, 1);
+    setCurrentMonthId(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
+  };
 
   if (isPublic) {
     // Modo Público: Mostra os dias escalados pros próximos 7 dias
@@ -286,24 +327,34 @@ export const EscaladoPage = ({ schedule, monthName, employees = [], currentMonth
         </PageTitle>
 
         {!isPublic && (
-          <button
-            onClick={() => {
-              const url = `${window.location.origin}${window.location.pathname}?public=true`;
-              navigator.clipboard.writeText(url);
-              toast.success('Link público copiado! 🎉');
-            }}
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', background: '#e50914', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}
-          >
-            <FaLink /> Copiar Link Público
-          </button>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            {monthName && (
+              <MonthNavigator>
+                <button className="nav-btn" onClick={handlePrevMonth} title="Mês Anterior">
+                  <FaChevronLeft />
+                </button>
+                <MonthLabel style={{ marginBottom: 0 }}>
+                  <FaCalendarCheck /> {monthName}
+                </MonthLabel>
+                <button className="nav-btn" onClick={handleNextMonth} title="Próximo Mês">
+                  <FaChevronRight />
+                </button>
+              </MonthNavigator>
+            )}
+            
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}${window.location.pathname}?public=true`;
+                navigator.clipboard.writeText(url);
+                toast.success('Link público copiado! 🎉');
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', background: '#e50914', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}
+            >
+              <FaLink /> Copiar Link Público
+            </button>
+          </div>
         )}
       </div>
-
-      {monthName && !isPublic && (
-        <MonthLabel>
-          <FaCalendarCheck /> {monthName}
-        </MonthLabel>
-      )}
 
       {filled.length === 0 ? (
         <EmptyState>

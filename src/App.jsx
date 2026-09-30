@@ -30,6 +30,10 @@ import {
 import { PDFDownloadLink, pdf } from '@react-pdf/renderer';
 import { EscalaPDF } from './utils/EscalaPDF';
 import logoPratique from './assets/Menor-PRATIQUE.png';
+import { LoginPage } from './pages/LoginPage';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './lib/firebase';
+
 
 // --- Layout ---
 const AppShell = styled.div`
@@ -110,8 +114,20 @@ export default function App() {
 
   const computedMonthName = new Date(currentMonthId + '-02').toLocaleString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase();
   const isPublicRoute = window.location.search.includes('public=true');
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (!currentUser && !isPublicRoute) {
+        setIsLoading(false);
+      }
+    });
+
+    if (!isPublicRoute && !user) {
+      return () => unsubAuth();
+    }
+
     const unsubEmployees = subscribeEmployees(setEmployees);
     const unsubSchedule = subscribeSchedule(isPublicRoute ? null : currentMonthId, setSchedule);
     const unsubSettings = subscribeSettings((data) => {
@@ -122,8 +138,8 @@ export default function App() {
       setIsLoading(false);
     });
 
-    return () => { unsubEmployees(); unsubSchedule(); unsubSettings(); };
-  }, [currentMonthId, isPublicRoute]);
+    return () => { unsubAuth(); unsubEmployees(); unsubSchedule(); unsubSettings(); };
+  }, [currentMonthId, isPublicRoute, user]);
 
   if (isLoading) {
     return (
@@ -152,6 +168,16 @@ export default function App() {
     );
   }
 
+  if (!user) {
+    return (
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <Toaster position="top-right" />
+        <LoginPage />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
@@ -176,7 +202,7 @@ export default function App() {
           )}
 
           {activeTab === 'escalado' && (
-            <EscaladoPage schedule={schedule} monthName={computedMonthName} employees={employees} currentMonthId={currentMonthId} showPhotos={showPhotos} />
+            <EscaladoPage schedule={schedule} monthName={computedMonthName} employees={employees} currentMonthId={currentMonthId} setCurrentMonthId={setCurrentMonthId} showPhotos={showPhotos} />
           )}
 
           {activeTab === 'equipe' && (

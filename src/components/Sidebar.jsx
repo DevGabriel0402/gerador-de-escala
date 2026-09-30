@@ -1,6 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaCalendarAlt, FaUsers, FaDice, FaCog, FaBars, FaTimes, FaCalendarCheck } from 'react-icons/fa';
+import { FaCalendarAlt, FaUsers, FaDice, FaCog, FaBars, FaTimes, FaCalendarCheck, FaSignOutAlt } from 'react-icons/fa';
+import { signOut } from 'firebase/auth';
+import { auth } from '../lib/firebase';
+import { toast } from 'react-hot-toast';
 
 const SIDEBAR_WIDTH = '240px';
 const SIDEBAR_COLLAPSED = '72px';
@@ -138,6 +141,40 @@ const UnitBadge = styled.div`
   }
 `;
 
+const LogoutBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: ${p => p.$open ? '0.85rem 1.4rem' : '0.85rem 0'};
+  justify-content: ${p => p.$open ? 'flex-start' : 'center'};
+  background: transparent;
+  color: rgba(255,255,255,0.72);
+  border: none;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  border-radius: 0 10px 10px 0;
+  margin-right: 12px;
+  margin-bottom: 1rem;
+  transition: all 0.2s;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+
+  svg {
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+
+  span {
+    display: ${p => p.$open ? 'inline' : 'none'};
+  }
+
+  &:hover {
+    background: rgba(255,255,255,0.14);
+    color: #ff4d4d;
+  }
+`;
+
 const MobileBar = styled.nav`
   display: none;
   position: fixed;
@@ -215,6 +252,14 @@ const TABS = [
 ];
 
 export const Sidebar = ({ activeTab, setActiveTab, unitName, open, setOpen }) => {
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success('Deslogado com sucesso');
+    } catch (error) {
+      toast.error('Erro ao sair');
+    }
+  };
 
   return (
     <>
@@ -247,6 +292,11 @@ export const Sidebar = ({ activeTab, setActiveTab, unitName, open, setOpen }) =>
           <div className="name">{unitName}</div>
           <div className="dot" />
         </UnitBadge>
+        
+        <LogoutBtn $open={open} onClick={handleLogout} title={!open ? 'Sair' : ''}>
+          <FaSignOutAlt />
+          <span>Sair</span>
+        </LogoutBtn>
       </SidebarWrap>
 
       <ToggleBtn $open={open} onClick={() => setOpen(p => !p)} className="no-print">
@@ -264,6 +314,10 @@ export const Sidebar = ({ activeTab, setActiveTab, unitName, open, setOpen }) =>
             <span>{tab.label}</span>
           </MobileTab>
         ))}
+        <MobileTab onClick={handleLogout}>
+          <FaSignOutAlt />
+          <span>Sair</span>
+        </MobileTab>
       </MobileBar>
     </>
   );
