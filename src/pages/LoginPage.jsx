@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import { Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
 import { Button } from '../styles/components';
 import logoPratique from '../assets/logo.png'; // or Menor-PRATIQUE.png
+import { LogoLoader } from '../components/LogoLoader';
 
 const slideUp = keyframes`
   from { opacity: 0; transform: translateY(30px); }
@@ -304,7 +305,7 @@ export function LoginPage() {
           </InputGroup>
           
           <StyledButton type="submit" $variant="primary" disabled={isLoading}>
-            {isLoading ? <Loader2 className="animate-spin" /> : 'Entrar na Conta'}
+            {isLoading ? <LogoLoader size="28px" /> : 'Entrar na Conta'}
           </StyledButton>
         </form>
       </LoginBox>

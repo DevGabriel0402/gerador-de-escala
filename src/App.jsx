@@ -4,6 +4,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import { FaXmark, FaEye, FaImage, FaPrint } from 'react-icons/fa6';
 import { FaWhatsapp } from 'react-icons/fa';
 import { Loader2 } from 'lucide-react';
+import { LogoLoader } from './components/LogoLoader';
 import html2canvas from 'html2canvas';
 
 import { GlobalStyle, theme } from './styles/global';
@@ -110,7 +111,7 @@ export default function App() {
   const now = new Date();
   const initialMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const [currentMonthId, setCurrentMonthId] = useState(initialMonth);
-  const [globalModal, setGlobalModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {}, type: 'info', isAlert: false });
+  const [globalModal, setGlobalModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => { }, type: 'info', isAlert: false });
 
   const computedMonthName = new Date(currentMonthId + '-02').toLocaleString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase();
   const isPublicRoute = window.location.search.includes('public=true');
@@ -146,8 +147,7 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
-          <Loader2 size={40} className="animate-spin" color={theme.colors.primary} />
-          <p style={{ fontWeight: 900, color: '#333' }}>CARREGANDO...</p>
+          <LogoLoader size="80px" />
         </div>
       </ThemeProvider>
     );
@@ -357,11 +357,11 @@ export default function App() {
                   <thead>
                     <tr>
                       {[
-                        { label: 'DIA',               w: '14%' },
-                        { label: 'MUSCULAÇÃO\n(LOW)',  w: '22%' },
-                        { label: 'MUSCULAÇÃO\nPRIME',  w: '22%' },
-                        { label: 'TROCA LOW',          w: '21%' },
-                        { label: 'TROCA PRIME',        w: '21%' },
+                        { label: 'DIA', w: '14%' },
+                        { label: 'MUSCULAÇÃO\n(LOW)', w: '22%' },
+                        { label: 'MUSCULAÇÃO\nPRIME', w: '22%' },
+                        { label: 'TROCA LOW', w: '21%' },
+                        { label: 'TROCA PRIME', w: '21%' },
                       ].map((h, i) => (
                         <th key={i} style={{
                           background: '#e50914',
@@ -501,7 +501,7 @@ export default function App() {
                     // Encontra o par mais próximo ou futuro
                     const [yearStr, monthStr] = currentMonthId.split('-');
                     const today = new Date();
-                    today.setHours(0,0,0,0);
+                    today.setHours(0, 0, 0, 0);
 
                     let closestPair = pairs[0];
                     for (const group of pairs) {
@@ -549,7 +549,7 @@ export default function App() {
                       // --- Sábado (ou primeiro dia) ---
                       if (rowA) {
                         const dayNameA = rowA.day.charAt(0).toUpperCase() + rowA.day.slice(1).toLowerCase();
-                        
+
                         if (rowA.prime) {
                           text += `🏋️‍♂️ Musculação 🏋️‍♂️\n🌟 PRIME 🌟\n${dayNameA}\n`;
                           text += formatNames(rowA.prime, '07:45 ');
@@ -566,7 +566,7 @@ export default function App() {
                       // --- Domingo (ou segundo dia) ---
                       if (rowB) {
                         const dayNameB = rowB.day.charAt(0).toUpperCase() + rowB.day.slice(1).toLowerCase();
-                        
+
                         if (rowB.prime) {
                           text += `🏋️‍♂️ Musculação 🏋️‍♂️\n🌟 PRIME 🌟\n${dayNameB} *\n`;
                           text += formatNames(rowB.prime, '08:45 ');
@@ -585,7 +585,7 @@ export default function App() {
                         text += `🔄 *Trocas:*\n`;
                         [rowA, rowB].filter(Boolean).forEach(row => {
                           if (row.trocaPrime) text += `⭐ PRIME ${row.day}: @${row.trocaPrime}\n`;
-                          if (row.trocaLow)   text += `💪 LOW ${row.day}: @${row.trocaLow}\n`;
+                          if (row.trocaLow) text += `💪 LOW ${row.day}: @${row.trocaLow}\n`;
                         });
                         text += `\n\n`;
                       }

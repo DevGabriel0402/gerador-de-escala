@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FaCalendarAlt, FaUsers, FaDice, FaCog, FaBars, FaTimes, FaCalendarCheck, FaSignOutAlt } from 'react-icons/fa';
+import { ChevronLeft } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { toast } from 'react-hot-toast';
@@ -154,7 +155,6 @@ const LogoutBtn = styled.button`
   border-left: 4px solid transparent;
   border-radius: 0 10px 10px 0;
   margin-right: 12px;
-  margin-bottom: 1rem;
   transition: all 0.2s;
   font-weight: 600;
   font-size: 0.9rem;
@@ -220,23 +220,39 @@ const MobileTab = styled.button`
 `;
 
 const ToggleBtn = styled.button`
-  position: fixed;
-  top: 1.3rem;
-  left: ${p => p.$open ? `calc(${SIDEBAR_WIDTH} + 8px)` : `calc(${SIDEBAR_COLLAPSED} + 8px)`};
-  z-index: 300;
   background: #fff;
-  border: 2px solid #e50914;
+  border: none;
   color: #e50914;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 100%;
+  padding: ${p => p.$open ? '1.1rem 1.4rem' : '1.1rem 0'};
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: ${p => p.$open ? 'flex-start' : 'center'};
+  gap: 14px;
   cursor: pointer;
-  transition: left 0.3s cubic-bezier(.4,0,.2,1);
-  box-shadow: 0 2px 12px rgba(229,9,20,0.18);
-  font-size: 0.75rem;
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+
+  &:hover {
+    background: #fdfdfd;
+    color: #b80710;
+  }
+
+  span {
+    display: ${p => p.$open ? 'inline' : 'none'};
+    white-space: nowrap;
+    font-size: 0.85rem;
+  }
+
+  svg {
+    transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+    transform: ${p => p.$open ? 'rotate(0deg)' : 'rotate(180deg)'};
+    flex-shrink: 0;
+  }
 
   @media (max-width: 900px) {
     display: none;
@@ -297,11 +313,12 @@ export const Sidebar = ({ activeTab, setActiveTab, unitName, open, setOpen }) =>
           <FaSignOutAlt />
           <span>Sair</span>
         </LogoutBtn>
-      </SidebarWrap>
 
-      <ToggleBtn $open={open} onClick={() => setOpen(p => !p)} className="no-print">
-        {open ? <FaTimes /> : <FaBars />}
-      </ToggleBtn>
+        <ToggleBtn $open={open} onClick={() => setOpen(p => !p)} className="no-print" title={open ? 'Recolher menu' : 'Expandir menu'}>
+          <ChevronLeft size={22} />
+          <span>Recolher</span>
+        </ToggleBtn>
+      </SidebarWrap>
 
       <MobileBar className="no-print">
         {TABS.map(tab => (
